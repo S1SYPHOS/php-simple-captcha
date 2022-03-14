@@ -1,11 +1,8 @@
-Captcha
-=======
+# Captcha
 
-![Captchas examples](http://gregwar.com/captchas.png)
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YUXRLWHQSWS6L)
+![Captcha examples](captchas.png)
 
-Installation
-============
+## Installation
 
 With composer :
 
@@ -18,8 +15,7 @@ With composer :
 }
 ```
 
-Usage
-=====
+## Usage
 
 You can create a captcha with the `CaptchaBuilder` :
 
@@ -55,28 +51,28 @@ Or inline it directly in the HTML page:
 <img src="<?php echo $builder->inline(); ?>" />
 ```
 
-You'll be able to get the code and compare it with a user input :
+You'll be able to get the code and compare it with a user input:
 
 ```php
 <?php
 
-// Example: storing the phrase in the session to test for the user 
-// input later
+// Example: storing the phrase in the session to test for the user input later
 $_SESSION['phrase'] = $builder->getPhrase();
 ```
 
-You can compare the phrase with user input:
+**Note:** Since one of the randomly selected fonts may contain only uppercase letters, you should compare the phrase with user input using `testPhrase()`, otherwise you might end up with unsolvable captchas:
+
 ```php
-if($builder->testPhrase($userInput)) {
+if ($builder->testPhrase($userInput)) {
     // instructions if user phrase is good
 }
+
 else {
     // user phrase is wrong
 }
 ```
 
-API
-===
+## API
 
 You can use theses functions :
 
@@ -122,25 +118,21 @@ You can also pass directly the wanted phrase to the builder:
 $captcha = new CaptchaBuilder('hello');
 ```
 
-Complete example
-================
+# Complete example
 
 If you want to see an example you can have a look at the ``demo/form.php``, which uses ``demo/session.php`` to
 render a captcha and check it after the submission
 
-Symfony Bundle
-================
+## Symfony Bundle
 
 You can have a look at the following repository to enjoy the Symfony 2 bundle packaging this captcha generator :
 https://github.com/Gregwar/CaptchaBundle
 
-Yii2 Extension
-===============
+## Yii2 Extension
 
 You can use the following extension for integrating with Yii2 Framework :
 https://github.com/juliardi/yii2-captcha
 
-License
-=======
+## License
 
 This library is under MIT license, have a look to the `LICENSE` file
