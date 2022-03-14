@@ -1,5 +1,11 @@
-.idea/
-demo/*.jpg
-demo/*.pgm
-demo/temp/
-vendor/
+# Composer
+/vendor
+/composer.lock
+
+# Temporary files
+/demo/*.jpg
+/demo/*.pgm
+/demo/temp/
+
+# Cache
+*.cache

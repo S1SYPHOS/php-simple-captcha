@@ -1,0 +1,26 @@
+pipeline:
+  build:
+    image: jitesoft/composer:${PHP}
+    commands:
+      # Add GD extension
+      # (1) Install prerequisites
+      - apk add freetype freetype-dev libpng libpng-dev libjpeg-turbo libjpeg-turbo-dev --no-cache
+
+      # (2) Install & enable GD
+      # TOOD: See https://stackoverflow.com/a/70857242
+      - docker-php-ext-configure gd --with-jpeg --with-jpeg-dir=/usr/lib64 --with-freetype --with-freetype-dir=/usr/include/freetype2
+      - docker-php-ext-install gd
+
+      # Install dependencies & run PHPUnit tests
+      - composer install
+      - composer run test
+
+matrix:
+  PHP:
+    - 7.2  # EOL 2019-11-30, SS 2020-11-30
+    - 7.3  # EOL 2020-12-06, SS 2021-12-06
+    - 7.4  # EOL 2021-11-28, SS 2022-11-28
+    - 8.0  # EOL 2020-11-26, SS 2023-10-26
+    - 8.1
+
+branches: main
