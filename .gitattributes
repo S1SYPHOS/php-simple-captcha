@@ -1,0 +1,6 @@
+# Set default behaviour to automatically normalize line endings
+* text=auto
+
+# Git stuff
+.gitattributes export-ignore
+.gitignore export-ignore
