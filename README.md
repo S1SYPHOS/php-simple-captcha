@@ -22,7 +22,7 @@ You can create a captcha with the `CaptchaBuilder` :
 ```php
 <?php
 
-use Gregwar\Captcha\CaptchaBuilder;
+use SimpleCaptcha\CaptchaBuilder;
 
 $builder = new CaptchaBuilder;
 $builder->build();
@@ -97,8 +97,8 @@ If you want to change the number of character, you can call the phrase builder d
 extra parameters:
 
 ```php
-use Gregwar\Captcha\CaptchaBuilder;
-use Gregwar\Captcha\PhraseBuilder;
+use SimpleCaptcha\CaptchaBuilder;
+use SimpleCaptcha\PhraseBuilder;
 
 // Will build phrases of 3 characters
 $phraseBuilder = new PhraseBuilder(4);

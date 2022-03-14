@@ -42,14 +42,14 @@ class CaptchaBuilderTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         # Initialize `CaptchaBuilder`
-        self::$builder = \Gregwar\Captcha\CaptchaBuilder::create()->build();
+        self::$builder = \SimpleCaptcha\CaptchaBuilder::create()->build();
     }
 
 
     public function testBuild()
     {
         # Assert result
-        $this->assertInstanceOf('Gregwar\Captcha\CaptchaBuilder', self::$builder);
+        $this->assertInstanceOf('SimpleCaptcha\CaptchaBuilder', self::$builder);
     }
 
 

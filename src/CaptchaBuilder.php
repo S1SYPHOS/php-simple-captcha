@@ -1,8 +1,9 @@
 <?php
 
-namespace Gregwar\Captcha;
+namespace SimpleCaptcha;
 
 use \Exception;
+
 
 /**
  * Builds a new captcha image
@@ -466,7 +467,7 @@ class CaptchaBuilder implements CaptchaBuilderInterface
         }
 
         if ($font === null) {
-            $font = __DIR__ . '/Font/captcha'.$this->rand(0, 5).'.ttf';
+            $font = __DIR__ . '/../fonts/captcha'.$this->rand(0, 5).'.ttf';
         }
 
         if (empty($this->backgroundImages)) {

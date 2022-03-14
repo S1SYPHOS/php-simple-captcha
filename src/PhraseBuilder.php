@@ -1,6 +1,7 @@
 <?php
 
-namespace Gregwar\Captcha;
+namespace SimpleCaptcha;
+
 
 /**
  * Generates random phrase
@@ -56,7 +57,7 @@ class PhraseBuilder implements PhraseBuilderInterface
     {
         return self::doNiceize($str);
     }
-    
+
     /**
      * A static helper to niceize
      */

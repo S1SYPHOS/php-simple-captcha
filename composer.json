@@ -1,6 +1,6 @@
 {
-    "name": "refbw/captcha",
-    "description": "Captcha generator",
+    "name": "refbw/simple-captcha",
+    "description": "Simple captcha generator",
     "type": "library",
     "license": "MIT",
     "keywords": ["captcha", "spam", "bot"],
@@ -42,7 +42,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Gregwar\\": "src/Gregwar"
+            "SimpleCaptcha\\": "src/"
         }
     }
 }
