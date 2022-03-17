@@ -1,11 +1,9 @@
 # php-simple-captcha
-[![Build](https://ci.codeberg.org/api/badges/refbw/php-simple-captcha/status.svg)](https://codeberg.org/refbw/php-simple-captcha/issues)
+[![Build](https://ci.codeberg.org/api/badges/S1SYPHOS/php-simple-captcha/status.svg)](https://codeberg.org/S1SYPHOS/php-simple-captcha/issues)
 
-![Example captcha images](example.png)
+![Example captcha images](examples.png)
 
 `php-simple-captcha` creates & verifies captcha images, dependency-free & respecting your user's privacy.
-
-**Note:** This library is being *heavily* refactored right now, as we're heading straight towards v2!
 
 
 ## Installation
@@ -13,7 +11,7 @@
 It's available for [Composer](https://getcomposer.org):
 
 ```text
-composer require refbw/php-simple-captcha
+composer require s1syphos/php-simple-captcha
 ```
 
 

@@ -1,10 +1,10 @@
 {
-    "name": "refbw/simple-captcha",
+    "name": "s1syphos/php-simple-captcha",
     "description": "Simple captcha generator",
     "type": "library",
     "license": "MIT",
-    "keywords": ["captcha", "spam", "bot"],
-    "homepage": "https://codeberg.org/RefBW/Captcha",
+    "keywords": ["captcha", "anti-spam", "spam-protection", "spam", "obfuscation", "security", "anti-bot", "no-bot", "bot-protection"],
+    "homepage": "https://codeberg.org/S1SYPHOS/php-simple-captcha",
     "scripts": {
         "cs-dry": "php-cs-fixer fix --dry-run --diff",
         "cs-fix": "php-cs-fixer fix",
@@ -15,17 +15,17 @@
             "name": "Grégoire Passault",
             "email": "g.passault@gmail.com",
             "homepage": "http://www.gregwar.com",
-            "role": "Author"
+            "role": "Founder"
         },
         {
             "name": "Jeremy Livingston",
             "email": "jeremy.j.livingston@gmail.com",
-            "role": "Author"
+            "role": "Contributor"
         },
         {
             "name": "Martin Folkers",
-            "email": "webmaster@refbw.de",
-            "homepage": "https://codeberg.org/S1SYPHOS",
+            "email": "hello@twobrain.io",
+            "homepage": "https://twobrain.io",
             "role": "Maintainer"
         }
     ],
