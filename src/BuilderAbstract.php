@@ -30,7 +30,7 @@ abstract class BuilderAbstract
     public string $phrase;
 
 
-    public static array $types = [
+    private static array $types = [
         'gif' => 'image/gif',
         'png' => 'image/png',
         'jpg' => 'image/jpeg',
@@ -124,7 +124,7 @@ abstract class BuilderAbstract
      * @param string $string
      * @return string
      */
-    public static function normalize(string $string): string
+    private static function normalize(string $string): string
     {
         return strtr(Str::lower($string), '01', 'ol');
     }
@@ -221,8 +221,12 @@ abstract class BuilderAbstract
      */
     protected function gd2img(int $quality = 90, ?string $filename = null, string $type = 'jpg'): void
     {
-        # Determine filetype
+        # Convert filetype to lowercase
+        $type = Str::lower($type);
+
+        # If filename is given ..
         if (!is_null($filename)) {
+            # .. determine filetype from it
             $type = F::extension($filename);
         }
 

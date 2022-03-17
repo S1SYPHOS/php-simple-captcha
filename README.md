@@ -1,144 +1,236 @@
-# Captcha
+# php-simple-captcha
+[![Build](https://ci.codeberg.org/api/badges/refbw/php-simple-captcha/status.svg)](https://codeberg.org/refbw/php-simple-captcha/issues)
 
-![Captcha examples](captchas.png)
+![Example captcha images](example.png)
+
+`php-simple-captcha` creates & verifies captcha images, dependency-free & respecting your user's privacy.
 
 **Note:** This library is being *heavily* refactored right now, as we're heading straight towards v2!
 
 
 ## Installation
 
-With composer :
+It's available for [Composer](https://getcomposer.org):
 
-``` json
-{
-    ...
-    "require": {
-        "gregwar/captcha": "1.*"
-    }
-}
+```text
+composer require refbw/php-simple-captcha
 ```
 
-## Usage
 
-You can create a captcha with the `CaptchaBuilder` :
+## Getting started
+
+Upon invoking the main class, you may specify a phrase (the string hidden in the captcha image), otherwise one will be created randomly:
 
 ```php
 <?php
 
-use SimpleCaptcha\CaptchaBuilder;
+require_once('vendor/autoload.php');
 
-$builder = new CaptchaBuilder;
+use SimpleCaptcha\Builder;
+
+# First, you have to instantiate it ..
+# (1) .. either this way ..
+$builder = new Builder;
+
+# (2) .. or this way
+$builder = Builder::create();
+
+# Now, building a captcha is easy
 $builder->build();
 ```
 
-You can then save it to a file :
+If you want the generated phrase to be *even more random*, `buildPhrase()` has your back:
 
 ```php
-<?php
+# Create random phrase ..
+# (1) .. consisting of 32 characters
+# (2) .. being randomly chosen from 'abc@123'
+$phrase = Builder::buildPhrase(32, 'abc@123');
 
+# Now proceed like above ..
+# (1) .. either this way ..
+$builder = new Builder($phrase);
+
+# (2) .. or this way
+$builder = Builder::create($phrase);
+```
+
+From here, you can ..
+
+**(1)** .. save the captcha to a file:
+
+```php
 $builder->save('out.jpg');
+
+# GIF & PNG are also supported, so this works too:
+$builder->save('out.png');
+$builder->save('out.gif');
+
+# Optionally, quality may be specified:
+# - JPG: 0-100
+# - PNG: 0-9
+$builder->save('low-quality.jpg', 40);
 ```
 
-Or output it directly :
+**(2)** .. output it directly in the browser:
 
 ```php
-<?php
-
-header('Content-type: image/jpeg');
+# Default: JPG & 90
 $builder->output();
+
+# .. but how about ..
+$builder->output(6, 'png');
 ```
 
-Or inline it directly in the HTML page:
+**(3)** .. inline its data URI in your HTML:
 
 ```php
-<img src="<?php echo $builder->inline(); ?>" />
+<img src="<?= $builder->inline() ?>" />
 ```
 
 You'll be able to get the code and compare it with a user input:
 
 ```php
-<?php
-
-// Example: storing the phrase in the session to test for the user input later
-$_SESSION['phrase'] = $builder->getPhrase();
+# Example: storing the phrase in the session to test for the user input later
+$_SESSION['phrase'] = $builder->phrase;
 ```
 
-**Note:** Since one of the randomly selected fonts may contain only uppercase letters, you should compare the phrase with user input using `compare()`, otherwise you might end up with unsolvable captchas:
+**Note:** Since one of the randomly selected fonts may contain letters looking very similar, you should validate user input using `compare()`, otherwise you might end up with unsolvable captchas:
 
 ```php
-if ($builder->compare($userInput)) {
-    // instructions if user phrase is good
-}
-
-else {
-    // user phrase is wrong
+if ($builder->compare($input)) {
+    # Valid phrase
+} else {
+    # Invalid phrase
 }
 ```
 
-## API
 
-You can use theses functions :
+## Usage
 
-* **__construct($phrase = null)**, constructs the builder with the given phrase, if the phrase is null, a random one will be generated
-* **getPhrase()**, allow you to get the phrase contents
-* **compare($phrase)**, returns true if the given phrase is good
-* **setDistortion($distortion)**, enable or disable the distortion, call it before `build()`
-* **isOCRReadable()**, returns `true` if the OCR can be read using the `ocrad` software, you'll need to have shell_exec enabled, imagemagick and ocrad installed
-* **buildAgainstOCR($width = 150, $height = 40, $font = null)**, builds a code until it is not readable by `ocrad`
-* **build($width = 150, $height = 40, $font = null)**, builds a code with the given $width, $height and $font. By default, a random font will be used from the library
-* **save($filename, $quality = 90)**, saves the captcha into a jpeg in the $filename, with the given quality
-* **inline($quality = 90)**, returns jpeg data as data URI (including MIME type, eg `data:image/jpeg;base64,<base64-encoded string>`)
-* **fetch($quality = 90)**, returns the jpeg data
-* **output($quality = 90)**, directly outputs the jpeg code to a browser
-* **setBackgroundColor([$r, $g, $b])**, sets the background color to force it (this will disable many effects and is not recommended)
-* **setBackgroundImages([$imagepath1, $imagePath2])**, Sets custom background images to be used as captcha background. It is recommended to disable image effects when passing custom images for background (ignore_all_effects). A random image is selected from the list passed, the full paths to the image files must be passed.
-* **setInterpolation($interpolate)**, enable or disable the interpolation (enabled by default), disabling it will be quicker but the images will look uglier
-* **setApplyAllEffects($applyAllEffects)**, enables all effects on the captcha image. Setting `false` may prove useful when passing custom background images for the captcha.
-* **setApplyPostEffects($applyPostEffects)**, enables post effects on the captcha image. Setting `false` may prove useful when passing custom background images for the captcha.
-* **setApplyScatterEffect($applyScatterEffect)**, enables scatter effect (PHP version >= 7.4).
-* **setMaxBehindLines($lines)**, sets the maximum number of lines behind the code
-* **setMaxFrontLines($lines)**, sets the maximum number of lines on the front of the code
+From there, the following functions are available:
 
-If you want to change the number of character, you can call the phrase builder directly using
-extra parameters:
 
-```php
-use SimpleCaptcha\CaptchaBuilder;
-use SimpleCaptcha\PhraseBuilder;
+### `build(int $width = 150, int $height = 40): self`
 
-// Will build phrases of 3 characters
-$phraseBuilder = new PhraseBuilder(4);
+Builds captcha image
 
-// Will build phrases of 5 characters, only digits
-$phraseBuilder = new PhraseBuilder(5, '0123456789');
 
-// Pass it as first argument of CaptchaBuilder, passing it the phrase
-// builder
-$captcha = new CaptchaBuilder(null, $phraseBuilder);
-```
+### `buildAgainstOCR(int $width = 150, int $height = 40): self`
 
-You can also pass directly the wanted phrase to the builder:
+Builds captcha image until it is (supposedly) unreadable by OCR software
 
-```php
-// Building a Captcha with the "hello" phrase
-$captcha = new CaptchaBuilder('hello');
-```
 
-# Complete example
+### `save(string $filename, int $quality = 90): void`
 
-If you want to see an example you can have a look at the ``demo/form.php``, which uses ``demo/session.php`` to
-render a captcha and check it after the submission
+Saves captcha image to file
 
-## Symfony Bundle
 
-You can have a look at the following repository to enjoy the Symfony 2 bundle packaging this captcha generator :
-https://github.com/Gregwar/CaptchaBundle
+### `output(int $quality = 90, string $type = 'jpg'): void`
 
-## Yii2 Extension
+Outputs captcha image directly
 
-You can use the following extension for integrating with Yii2 Framework :
-https://github.com/juliardi/yii2-captcha
 
-## License
+### `fetch(int $quality = 90, string $type = 'jpg'): string`
 
-This library is under MIT license, have a look to the `LICENSE` file
+Fetches captcha image contents
+
+
+### `inline(int $quality = 90, string $type = 'jpg'): string`
+
+Fetches captcha image as data URI
+
+
+### `compare(string $phrase, string $string = null): bool`
+
+Checks whether captcha was solved correctly. Upon passing another string, both strings are compared (instead of first string & current phrase).
+
+
+## Configuration
+
+There are several settings you may use in order to change the behavior of the library:
+
+
+### `$builder->phrase (string)`
+
+Captcha phrase. Default: random, see `buildPhrase()`
+
+
+### `$builder->font (string)`
+
+Path to captcha font. Default: one of the four included font files inside `fonts`
+
+
+### `$builder->distort (bool)`
+
+Whether to distort the image. Default: `true`
+
+
+### `$builder->interpolate (bool)`
+
+Whether to interpolate the image. Default: `true`
+
+
+### `$builder->maxLinesBehind (int)`
+
+Maximum number of lines behind the captcha phrase. Default: random
+
+
+### `$builder->maxLinesFront (int)`
+
+Maximum number of lines in front of the captcha phrase. Default: random
+
+
+### `$builder->maxAngle (int)`
+
+Maximum character angle. Default: `8`
+
+
+### `$builder->maxOffset (int)`
+
+Maximum character offset. Default: `5`
+
+
+### `$builder->bgColor (string|array)`
+
+Background color, either RGB values (array) or `'transparent'` (string). Default: random
+
+
+### `$builder->lineColor (array)`
+
+Line color RGB values
+
+
+### `$builder->textColor (array)`
+
+Text color RGB values
+
+
+### `$builder->bgImage (string)`
+
+Path to background image. Default: background fill, see `bgColor`
+
+
+### `$builder->applyEffects (bool)`
+
+Whether to apply any effects. Default: `true`
+
+
+### `$builder->applyPostEffects (bool)`
+
+Whether to apply post effects. Default: `true`
+
+
+### `$builder->applyScatterEffect (bool)`
+
+Whether to enable scatter effect. Default: `true`
+
+
+## Examples
+
+Have a look at the examples inside the `demo` folder, which should give you an impression of what's possible.
+
+
+## Credits
+
+This library is based on [`Gregwar/Captcha`](https://github.com/Gregwar/Captcha), introducing several new features & bug fixes.

@@ -59,19 +59,19 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Maximum number of lines in front of the image
-     *
-     * @var int
-     */
-    public ?int $maxLinesFront = null;
-
-
-    /**
-     * Maximum number of lines behind the image
+     * Maximum number of lines behind the captcha phrase
      *
      * @var int
      */
     public ?int $maxLinesBehind = null;
+
+
+    /**
+     * Maximum number of lines in front of the captcha phrase
+     *
+     * @var int
+     */
+    public ?int $maxLinesFront = null;
 
 
     /**
@@ -134,7 +134,7 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Whether to apply all effects
+     * Whether to apply (any) effects
      *
      * @var bool
      */
@@ -142,7 +142,7 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Whether to apply all post effects
+     * Whether to apply post effects
      *
      * @var bool
      */
@@ -348,7 +348,7 @@ class Builder extends BuilderAbstract
      *
      * @return void
      */
-    public function distort(): void
+    private function distort(): void
     {
         $image = imagecreatetruecolor($this->width, $this->height);
 
@@ -553,7 +553,7 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Builds while the code is readable against an OCR
+     * Builds captcha image until it is (supposedly) unreadable by OCR software
      *
      * @param int $width Captcha image width
      * @param int $height Captcha image height
