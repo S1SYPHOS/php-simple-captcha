@@ -2,14 +2,16 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->exclude([
-      'tmp'
+        'demo',
+        'fonts',
     ])
     ->in(__DIR__)
 ;
 
-return PhpCsFixer\Config::create()
-    ->setRules([
-        '@PSR2' => true,
+$config = new PhpCsFixer\Config();
+
+return $config->setRules([
+        '@PSR12' => true,
         'array_syntax' => ['syntax' => 'short'],
     ])
     ->setFinder($finder)

@@ -1,10 +1,9 @@
 <?php
 require_once __DIR__.'/../vendor/autoload.php';
 
-use Gregwar\Captcha\CaptchaBuilder;
+use SimpleCaptcha\Builder;
 
-$captcha = new CaptchaBuilder();
-$captcha->build();
+Builder::create()->build();
 
 ?>
 <!DOCTYPE html>
@@ -16,7 +15,7 @@ $captcha->build();
         <h1>Inline Captcha</h1>
 
         <img src="<?php echo $captcha->inline(); ?>"/><br/>
-        Phrase: <?php echo $captcha->getPhrase(); ?>
-        
+        Phrase: <?php echo $captcha->phrase; ?>
+
     </body>
 </body>

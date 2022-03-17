@@ -2,11 +2,8 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use Gregwar\Captcha\CaptchaBuilder;
+use SimpleCaptcha\Builder;
 
 header('Content-type: image/jpeg');
 
-CaptchaBuilder::create()
-    ->build()
-    ->output()
-;
+Builder::create()->build()->output();

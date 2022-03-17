@@ -2,10 +2,9 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use Gregwar\Captcha\CaptchaBuilder;
+use SimpleCaptcha\Builder;
 
-$captcha = new CaptchaBuilder;
-$captcha
+Builder::create()
     ->build()
     ->save('out.jpg')
 ;

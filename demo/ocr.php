@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use Gregwar\Captcha\CaptchaBuilder;
+use SimpleCaptcha\Builder;
 
 /**
  * Generates 1000 captchas and try to read their code with the
@@ -17,12 +17,8 @@ shell_exec('rm passed*.jpg');
 for ($i=0; $i<$tests; $i++) {
     echo "Captcha $i/$tests... ";
 
-    $captcha = new CaptchaBuilder;
-
-    $captcha
-        ->setDistortion(false)
-        ->build()
-    ;
+    $captcha = new Builder;
+    $captcha->setDistortion(false)->build();
 
     if ($captcha->isOCRReadable()) {
         $passed++;

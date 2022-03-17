@@ -2,6 +2,9 @@
 
 ![Captcha examples](captchas.png)
 
+**Note:** This library is being *heavily* refactored right now, as we're heading straight towards v2!
+
+
 ## Installation
 
 With composer :
@@ -60,10 +63,10 @@ You'll be able to get the code and compare it with a user input:
 $_SESSION['phrase'] = $builder->getPhrase();
 ```
 
-**Note:** Since one of the randomly selected fonts may contain only uppercase letters, you should compare the phrase with user input using `testPhrase()`, otherwise you might end up with unsolvable captchas:
+**Note:** Since one of the randomly selected fonts may contain only uppercase letters, you should compare the phrase with user input using `compare()`, otherwise you might end up with unsolvable captchas:
 
 ```php
-if ($builder->testPhrase($userInput)) {
+if ($builder->compare($userInput)) {
     // instructions if user phrase is good
 }
 
@@ -78,18 +81,21 @@ You can use theses functions :
 
 * **__construct($phrase = null)**, constructs the builder with the given phrase, if the phrase is null, a random one will be generated
 * **getPhrase()**, allow you to get the phrase contents
+* **compare($phrase)**, returns true if the given phrase is good
 * **setDistortion($distortion)**, enable or disable the distortion, call it before `build()`
 * **isOCRReadable()**, returns `true` if the OCR can be read using the `ocrad` software, you'll need to have shell_exec enabled, imagemagick and ocrad installed
 * **buildAgainstOCR($width = 150, $height = 40, $font = null)**, builds a code until it is not readable by `ocrad`
 * **build($width = 150, $height = 40, $font = null)**, builds a code with the given $width, $height and $font. By default, a random font will be used from the library
-* **save($filename, $quality = 80)**, saves the captcha into a jpeg in the $filename, with the given quality
-* **get($quality = 80)**, returns the jpeg data
-* **output($quality = 80)**, directly outputs the jpeg code to a browser
-* **setBackgroundColor($r, $g, $b)**, sets the background color to force it (this will disable many effects and is not recommended)
-* **setBackgroundImages(array($imagepath1, $imagePath2))**, Sets custom background images to be used as captcha background. It is recommended to disable image effects when passing custom images for background (ignore_all_effects). A random image is selected from the list passed, the full paths to the image files must be passed.
+* **save($filename, $quality = 90)**, saves the captcha into a jpeg in the $filename, with the given quality
+* **inline($quality = 90)**, returns jpeg data as data URI (including MIME type, eg `data:image/jpeg;base64,<base64-encoded string>`)
+* **fetch($quality = 90)**, returns the jpeg data
+* **output($quality = 90)**, directly outputs the jpeg code to a browser
+* **setBackgroundColor([$r, $g, $b])**, sets the background color to force it (this will disable many effects and is not recommended)
+* **setBackgroundImages([$imagepath1, $imagePath2])**, Sets custom background images to be used as captcha background. It is recommended to disable image effects when passing custom images for background (ignore_all_effects). A random image is selected from the list passed, the full paths to the image files must be passed.
 * **setInterpolation($interpolate)**, enable or disable the interpolation (enabled by default), disabling it will be quicker but the images will look uglier
-* **setIgnoreAllEffects($ignoreAllEffects)**, disable all effects on the captcha image. Recommended to use when passing custom background images for the captcha.
-* **testPhrase($phrase)**, returns true if the given phrase is good
+* **setApplyAllEffects($applyAllEffects)**, enables all effects on the captcha image. Setting `false` may prove useful when passing custom background images for the captcha.
+* **setApplyPostEffects($applyPostEffects)**, enables post effects on the captcha image. Setting `false` may prove useful when passing custom background images for the captcha.
+* **setApplyScatterEffect($applyScatterEffect)**, enables scatter effect (PHP version >= 7.4).
 * **setMaxBehindLines($lines)**, sets the maximum number of lines behind the code
 * **setMaxFrontLines($lines)**, sets the maximum number of lines on the front of the code
 
