@@ -28,6 +28,44 @@ use Exception;
 class Dir
 {
     /**
+     * Ignore when scanning directories
+     *
+     * @var array
+     */
+    public static $ignore = [
+        '.',
+        '..',
+        '.DS_Store',
+        '.gitignore',
+        '.git',
+        '.svn',
+        '.htaccess',
+        'Thumb.db',
+        '@eaDir'
+    ];
+
+
+    /**
+     * Get all files
+     *
+     * @param string $dir
+     * @param array $ignore
+     * @param bool $absolute
+     * @return array
+     */
+    public static function files(string $dir, array $ignore = null, bool $absolute = false): array
+    {
+        $result = array_values(array_filter(static::read($dir, $ignore, true), 'is_file'));
+
+        if ($absolute !== true) {
+            $result = array_map('basename', $result);
+        }
+
+        return $result;
+    }
+
+
+    /**
      * Creates a new directory
      *
      * @param string $dir The path for the new directory
@@ -62,6 +100,37 @@ class Dir
         }
 
         return mkdir($dir);
+    }
+
+
+    /**
+     * Reads all files from a directory and returns them as an array.
+     * It skips unwanted invisible stuff.
+     *
+     * @param string $dir The path of directory
+     * @param array $ignore Optional array with filenames, which should be ignored
+     * @param bool $absolute If true, the full path for each item will be returned
+     * @return array An array of filenames
+     */
+    public static function read(string $dir, array $ignore = null, bool $absolute = false): array
+    {
+        if (is_dir($dir) === false) {
+            return [];
+        }
+
+        // create the ignore pattern
+        $ignore ??= static::$ignore;
+        $ignore   = array_merge($ignore, ['.', '..']);
+
+        // scan for all files and dirs
+        $result = array_values((array)array_diff(scandir($dir), $ignore));
+
+        // add absolute paths
+        if ($absolute === true) {
+            $result = array_map(fn ($item) => $dir . '/' . $item, $result);
+        }
+
+        return $result;
     }
 
 

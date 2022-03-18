@@ -51,6 +51,11 @@ $builder = new Builder($phrase);
 
 # (2) .. or this way
 $builder = Builder::create($phrase);
+
+# You may also pass
+# - a single font filepath (as string) or
+# - multiple at once (array)
+$builder = Builder::create($phrase, $fonts);
 ```
 
 From here, you can ..
@@ -154,9 +159,9 @@ There are several settings you may use in order to change the behavior of the li
 Captcha phrase. Default: random, see `buildPhrase()`
 
 
-### `$builder->font (string)`
+### `$builder->fonts (array)`
 
-Path to captcha font. Default: one of the four included font files inside `fonts`
+Paths to captcha fonts. Default: Font files inside `fonts`
 
 
 ### `$builder->distort (bool)`
@@ -222,6 +227,11 @@ Whether to apply post effects. Default: `true`
 ### `$builder->applyScatterEffect (bool)`
 
 Whether to enable scatter effect. Default: `true`
+
+
+### `$builder->randomizeFonts (bool)`
+
+Whether to use random font for each symbol. Default: `true`
 
 
 ## Examples

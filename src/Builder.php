@@ -39,7 +39,7 @@ class Builder extends BuilderAbstract
      * @var string
      */
 
-    public ?string $font = null;
+    public ?array $fonts = null;
 
 
     /**
@@ -158,18 +158,35 @@ class Builder extends BuilderAbstract
 
 
     /**
+     * Whether to use random font for each symbol
+     *
+     * @var bool
+     */
+    public bool $randomizeFonts = true;
+
+
+    /**
      * Constructor
      *
      * @param string $phrase Captcha phrase
+     * @param array $fonts Font files
      * @return void
      */
-    public function __construct(?string $phrase = null)
+    public function __construct(?string $phrase = null, ?array $fonts = null)
     {
         # Build random phrase if missing input or empty string
         $this->phrase = $phrase ?: $this->buildPhrase();
 
-        # Determine captcha font
-        $this->font = __DIR__ . '/../fonts/captcha' . mt_rand(0, 4) . '.ttf';
+        # Determine fonts to choose from, allowing to ..
+        if (is_null($fonts)) {
+            # .. fallback to default fonts
+            $this->fonts = Dir::files(__DIR__ . '/../fonts', null, true);
+        }
+
+        else {
+            # .. use single filepaths & arrays alike
+            $this->fonts = (array) $fonts;
+        }
     }
 
 
@@ -181,12 +198,12 @@ class Builder extends BuilderAbstract
      * Instantiates 'CaptchaBuilder' object
      *
      * @param string $phrase Captcha phrase
+     * @param array $fonts Font files
      * @return self
      */
-    public static function create(?string $phrase = null): self
+    public static function create(?string $phrase = null, ?array $fonts = null): self
     {
-        # TODO: See constructor
-        return new self($phrase);
+        return new self($phrase, $fonts);
     }
 
 
@@ -235,6 +252,17 @@ class Builder extends BuilderAbstract
 
 
     /**
+     * Randomizes font file
+     *
+     * @return string
+     */
+    private function randomFont(): string
+    {
+        return $this->fonts[mt_rand(0, count($this->fonts) - 1)];
+    }
+
+
+    /**
      * Writes captcha phrase on captcha image
      *
      * @return void
@@ -244,22 +272,30 @@ class Builder extends BuilderAbstract
         # Determine number of characters
         $length = Str::length($this->phrase);
 
+        # Choose random font
+        $font = $this->randomFont();
+
         # Determine text size & start position
         $size = (int) round($this->width / $length) - mt_rand(0, 3) - 1;
-        $box = imagettfbbox($size, 0, $this->font, $this->phrase);
+        $box = imagettfbbox($size, 0, $this->fonts[0], $this->phrase);
         $textWidth = $box[2] - $box[0];
         $textHeight = $box[1] - $box[7];
         $x = (int) round(($this->width - $textWidth) / 2);
         $y = (int) round(($this->height - $textHeight) / 2) + $size;
 
-        # Write the letters one by one at random angle
+        # Write individual letters ..
         for ($i = 0; $i < $length; $i++) {
+            # .. using random font (if enabled)
+            if ($this->randomizeFonts) {
+                $font = $this->randomFont();
+            }
+
             $symbol = Str::substr($this->phrase, $i, 1);
-            $box = imagettfbbox($size, 0, $this->font, $symbol);
+            $box = imagettfbbox($size, 0, $font, $symbol);
             $w = $box[2] - $box[0];
             $angle = mt_rand(-$this->maxAngle, $this->maxAngle);
             $offset = mt_rand(-$this->maxOffset, $this->maxOffset);
-            imagettftext($this->image, $size, $angle, $x, $y + $offset, $this->textCode, $this->font, $symbol);
+            imagettftext($this->image, $size, $angle, $x, $y + $offset, $this->textCode, $font, $symbol);
             $x += $w;
         }
     }

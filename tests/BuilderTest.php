@@ -2,6 +2,7 @@
 
 namespace SimpleCaptcha\Tests;
 
+use SimpleCaptcha\Helpers\Dir;
 use SimpleCaptcha\Helpers\Str;
 use SimpleCaptcha\Builder;
 
@@ -66,6 +67,26 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     {
         # Assert result
         $this->assertInstanceOf('SimpleCaptcha\Builder', Builder::create());
+    }
+
+
+    public function testCreateFonts(): void
+    {
+        # Setup
+        # (1) Default font files
+        $defaultFonts = Dir::files(__DIR__ . '/../fonts', null, true);
+
+        # (2) Custom font files
+        $customFonts = Dir::files(__DIR__ . '/fixtures/fonts', ['License.txt', 'Readme+License.html'], true);
+
+        # Assert defaults
+        $this->assertEquals(array_map('realpath', self::$builder->fonts), array_map('realpath', $defaultFonts));
+
+        # Run function
+        $builder = Builder::create(null, $customFonts);
+
+        # Assert funtion
+        $this->assertEquals(array_map('realpath', $builder->fonts), array_map('realpath', $customFonts));
     }
 
 
