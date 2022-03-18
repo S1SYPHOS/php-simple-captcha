@@ -1,18 +1,23 @@
 pipeline:
   build:
-    image: jitesoft/composer:${PHP}
+    image: php:${PHP}-cli
     commands:
       # Add GD extension
       # (1) Install prerequisites
-      - apk add freetype freetype-dev libpng libpng-dev libjpeg-turbo libjpeg-turbo-dev --no-cache
+      - apt update && apt install --yes curl git unzip libfreetype6-dev zlib1g-dev libpng-dev libjpeg-dev
 
-      # (2) Install & enable GD
-      # TOOD: See https://stackoverflow.com/a/70857242
-      - docker-php-ext-configure gd --with-jpeg --with-jpeg-dir=/usr/lib64 --with-freetype --with-freetype-dir=/usr/include/freetype2
-      - docker-php-ext-install gd
+      # (2) Install & configure GD
+      - docker-php-ext-configure gd --with-jpeg --with-freetype
+      - docker-php-ext-install -j$(nproc) gd
 
-      # Install dependencies & run PHPUnit tests
+      # Install composer
+      - curl -sSL https://raw.githubusercontent.com/composer/getcomposer.org/master/web/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+      # Install dependencies
+      - apt install --yes ocrad tesseract-ocr
       - composer install
+
+      # Run PHPUnit tests
       - composer run test
 
 matrix:
