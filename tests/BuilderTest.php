@@ -155,7 +155,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertFileExists($path);
-        $this->assertTrue(is_string($content1));
+        $this->assertIsString($content1);
         $this->assertTrue(Str::contains($content1, 'quality = 90'));
 
         # Run function #2
@@ -164,7 +164,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertFileExists($path);
-        $this->assertTrue(is_string($content2));
+        $this->assertIsString($content2);
         $this->assertTrue(Str::contains($content2, 'quality = 10'));
 
         # Run function #3
@@ -196,7 +196,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertFileExists($path);
-        $this->assertTrue(is_string($content));
+        $this->assertIsString($content);
         $this->assertTrue(Str::startsWith(file_get_contents($path), 'GIF'));
 
         # Run function #2
@@ -228,7 +228,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertFileExists($path);
-        $this->assertTrue(is_string($content1));
+        $this->assertIsString($content1);
         $this->assertTrue(Str::startsWith($content1, 'PNG'));
 
         # Run function #2
@@ -237,7 +237,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
         # Assert result
         $this->assertFileExists($path);
-        $this->assertTrue(is_string($content2));
+        $this->assertIsString($content2);
         $this->assertTrue(Str::startsWith($content2, 'PNG'));
 
         # Run function #3
