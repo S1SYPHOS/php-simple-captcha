@@ -219,6 +219,11 @@ Path to background image. Default: background fill, see `bgColor`
 Whether to apply any effects. Default: `true`
 
 
+### `$builder->applyNoise (bool)`
+
+Whether to apply background noise (using random letters). Default: `true`
+
+
 ### `$builder->applyPostEffects (bool)`
 
 Whether to apply post effects. Default: `true`

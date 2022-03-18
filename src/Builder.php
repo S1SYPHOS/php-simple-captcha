@@ -142,6 +142,14 @@ class Builder extends BuilderAbstract
 
 
     /**
+     * Whether to apply background noise (using random letters)
+     *
+     * @var bool
+     */
+    public bool $applyNoise = true;
+
+
+    /**
      * Whether to apply post effects
      *
      * @var bool
@@ -248,6 +256,29 @@ class Builder extends BuilderAbstract
         # Randomize thickness & draw line
         imagesetthickness($this->image, mt_rand(1, 3));
         imageline($this->image, $Xa, $Ya, $Xb, $Yb, $color);
+    }
+
+
+    /**
+     * Applies background noise (using random letters)
+     *
+     * @return void
+     */
+    private function applyNoise(): void
+    {
+        for ($i = 0; $i < 10; $i++) {
+            $color = imagecolorallocate($this->image, mt_rand(150, 225), mt_rand(150, 225), mt_rand(150, 225));
+
+            $x = mt_rand(-$this->width, $this->width);
+            $y = mt_rand(-$this->height, $this->height);
+            $symbol = static::$charset[mt_rand(0, Str::length(static::$charset) -1)];
+
+            for ($j = 0; $j < 5; $j++) {
+                # TODO: Create wrapper for `imagettftext` in order to
+                # replace all references of `imagettftext` & `imagestring`
+                imagestring($this->image, 5, $x, $y, $symbol, $color);
+            }
+        }
     }
 
 
@@ -512,6 +543,11 @@ class Builder extends BuilderAbstract
                 for ($e = 0; $e < $effects; $e++) {
                     $this->drawLine();
                 }
+            }
+
+            # Apply background noise
+            if ($this->applyNoise) {
+                $this->applyNoise();
             }
         }
 

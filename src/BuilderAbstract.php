@@ -38,6 +38,14 @@ abstract class BuilderAbstract
 
 
     /**
+     * Characters used for building random phrases
+     *
+     * @var string
+     */
+    protected static string $charset = 'abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+
+
+    /**
      * Abstract methods
      */
 
@@ -102,8 +110,13 @@ abstract class BuilderAbstract
      * @param string $charset Allowed characters
      * @return string
      */
-    public static function buildPhrase(int $length = 5, string $charset = 'abcdefghijklmnpqrstuvwxyz123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'): string
+    public static function buildPhrase(int $length = 5, ?string $charset = null): string
     {
+        # Determine characters to use
+        if (is_null($charset)) {
+            $charset = self::$charset;
+        }
+
         # Create charset array
         $characters = str_split($charset);
 
