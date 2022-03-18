@@ -33,8 +33,10 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-gd": "*",
-        "ext-mbstring": "*",
-        "symfony/finder": "*"
+        "ext-mbstring": "*"
+    },
+    "suggest": {
+        "thiagoalessio/tesseract_ocr": "Provides better results when building against OCR. Requires 'tesseract-ocr' to be installed."
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",

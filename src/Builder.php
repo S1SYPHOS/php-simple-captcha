@@ -528,27 +528,69 @@ class Builder extends BuilderAbstract
      *
      * @param string $tmpDir Directory
      * @return bool
+     * @throws \Exception
      */
     public function isOCRReadable(string $tmpDir = '.tmp'): bool
     {
+        $commands = [
+            'ocrad' => 'ocrad --scale=2 --charset=ascii %s',
+            'tesseract' => 'tesseract %s stdout -l eng --dpi 2200',
+        ];
+
+        $modes = [];
+
+        foreach (array_keys($commands) as $mode) {
+            if (empty(exec('command -v ' . $mode))) {
+                continue;
+            }
+
+            $modes[] = $mode;
+        }
+
+        if (empty($modes)) {
+            throw new Exception('OCR detection requires either "ocrad" or "tesseract-ocr" to be installed.');
+        }
+
         # Create temporary directory (if necessary)
         Dir::make($tmpDir);
 
-        # Join filepath & ceate unique filename
-        $identifier = uniqid('captcha');
-        $tmpFile = sprintf('%s/%s.jpg', $tmpDir, $identifier);
-        $pgmFile = sprintf('%s/%s.pgm', $tmpDir, $identifier);
+        # Join filepath & generate unique filename
+        $pgmFile = sprintf('%s/%s.pgm', $tmpDir, uniqid('captcha'));
 
-        # Output captcha image & convert to grayscale
-        $this->save($tmpFile);
-        $this->img2grayscale($tmpFile, $pgmFile);
+        # Create captcha image & convert to grayscale
+        $this->img2ocr($this->image, $pgmFile);
 
-        $value = Str::trim(Str::lower(shell_exec("ocrad $pgmFile")));
+        # Create data array for possible matches
+        $outputs = [];
+
+        # Iterate over available modes ..
+        foreach ($modes as $mode) {
+            # .. using (suggested) external library (if available), otherwise ..
+            if ($mode == 'tesseract' && class_exists('\thiagoalessio\TesseractOCR\TesseractOCR')) {
+                # Execute  `tesseract-ocr-for-php` & store its output
+                $tesseract = new \thiagoalessio\TesseractOCR\TesseractOCR($pgmFile);
+                $outputs[] = $tesseract->allowlist(range(0, 9), range('a', 'z'), range('A', 'Z'))->dpi(2200)->run();
+            }
+
+            # .. falling back to shell commands
+            else {
+                # Execute OCR library from CLI
+                $outputs[] = shell_exec(sprintf($commands[$mode], $pgmFile));
+            }
+        }
 
         # Delete temporary files & directory
         Dir::remove($tmpDir);
 
-        return $this->compare($value);
+        # Iterate over possible matches
+        foreach ($outputs as $output) {
+            # .. clean & validate them
+            if ($this->compare(preg_replace('/[^a-z0-9]/i', '', $output))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

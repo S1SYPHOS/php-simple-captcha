@@ -294,22 +294,113 @@ abstract class BuilderAbstract
 
 
     /**
-     * Converts image to PGM (grayscale)
+     * Converts image for better use with OCR software
      *
      * See https://priteshgupta.com/2011/09/advanced-image-functions-using-php
+     * See https://github.com/raoulduke/phpocrad
      *
-     * @param string $file Input file
+     * @param string $image Captcha image
      * @param string $file Output file
+     * @param int $amount
+     * @param int $radius
+     * @param int $threshold
      * @return void
      */
-    protected function img2grayscale(string $file, ?string $output = null): void
+    protected function img2ocr($image, ?string $output = null, int $amount = 80, int $radius = 1, int $threshold = 3): void
     {
-        $image = $this->img2gd($file);
+        $width = imagesx($image);
+        $height = imagesy($image);
 
-        $pgm = 'P5 ' . imagesx($image) . ' ' . imagesy($image).' 255' . "\n";
+        $canvas = imagecreatetruecolor($width, $height);
+        $blurred = imagecreatetruecolor($width, $height);
 
-        for ($y = 0; $y < imagesy($image); $y++) {
-            for ($x = 0; $x < imagesx($image); $x++) {
+        # Apply gaussian blur matrix
+        $matrix = [
+            [1, 2, 1],
+            [2, 4, 2],
+            [1, 2, 1],
+        ];
+
+        imagecopy($blurred, $image, 0, 0, 0, 0, $width, $height);
+        imageconvolution($blurred, $matrix, 16, 0);
+
+        if ($threshold > 0) {
+            # Calculate the difference between the blurred pixels and the original
+            # and set the pixels
+            for ($x = 0; $x < $width-1; $x++) {  # each row
+                for ($y = 0; $y < $height; $y++) { # each pixel
+                    $rgbOrig = imagecolorat($image, $x, $y);
+
+                    $rOrig = (($rgbOrig >> 16) & 0xFF);
+                    $gOrig = (($rgbOrig >> 8) & 0xFF);
+                    $bOrig = ($rgbOrig & 0xFF);
+
+                    $rgbBlur = imagecolorat($blurred, $x, $y);
+
+                    $rBlur = (($rgbBlur >> 16) & 0xFF);
+                    $gBlur = (($rgbBlur >> 8) & 0xFF);
+                    $bBlur = ($rgbBlur & 0xFF);
+
+                    # When the masked pixels differ less from the original
+                    # than the threshold specifies, they are set to their original value.
+                    $rNew = (abs($rOrig - $rBlur) >= $threshold)
+                        ? max(0, min(255, ($amount * ($rOrig - $rBlur)) + $rOrig))
+                        : $rOrig;
+                    $gNew = (abs($gOrig - $gBlur) >= $threshold)
+                        ? max(0, min(255, ($amount * ($gOrig - $gBlur)) + $gOrig))
+                        : $gOrig;
+                    $bNew = (abs($bOrig - $bBlur) >= $threshold)
+                        ? max(0, min(255, ($amount * ($bOrig - $bBlur)) + $bOrig))
+                        : $bOrig;
+
+                    if (($rOrig != $rNew) || ($gOrig != $gNew) || ($bOrig != $bNew)) {
+                        $pixCol = ImageColorAllocate($image, $rNew, $gNew, $bNew);
+                        imagesetpixel($image, $x, $y, $pixCol);
+                    }
+                }
+            }
+        }
+
+        else {
+            for ($x = 0; $x < $width; $x++) { # each row
+                for ($y = 0; $y < $height; $y++) { # each pixel
+                    $rgbOrig = imagecolorat($image, $x, $y);
+
+                    $rOrig = (($rgbOrig >> 16) & 0xFF);
+                    $gOrig = (($rgbOrig >> 8) & 0xFF);
+                    $bOrig = ($rgbOrig & 0xFF);
+
+                    $rgbBlur = imagecolorat($blurred, $x, $y);
+
+                    $rBlur = (($rgbBlur >> 16) & 0xFF);
+                    $gBlur = (($rgbBlur >> 8) & 0xFF);
+                    $bBlur = ($rgbBlur & 0xFF);
+
+                    $rNew = ($amount * ($rOrig - $rBlur)) + $rOrig;
+                        if ($rNew > 255) { $rNew = 255; }
+                        elseif ($rNew < 0) { $rNew = 0; }
+                    $gNew = ($amount * ($gOrig - $gBlur)) + $gOrig;
+                        if ($gNew > 255) { $gNew = 255; }
+                        elseif ($gNew < 0) { $gNew = 0; }
+                    $bNew = ($amount * ($bOrig - $bBlur)) + $bOrig;
+                        if ($bNew > 255) { $bNew = 255; }
+                        elseif ($bNew < 0) { $bNew = 0; }
+                    $rgbNew = ($rNew << 16) + ($gNew << 8) + $bNew;
+
+                    imagesetpixel($image, $x, $y, $rgbNew);
+                }
+            }
+        }
+
+        # Remove temporary image data
+        imagedestroy($canvas);
+        imagedestroy($blurred);
+
+        # Create PGM file (grayscale)
+        $pgm = 'P5 ' . $width . ' ' . $height . ' 255' . "\n";
+
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
                 $colors = imagecolorsforindex($image, imagecolorat($image, $x, $y));
                 $pgm .= chr(0.3 * $colors['red'] + 0.59 * $colors['green'] + 0.11 * $colors['blue']);
             }
