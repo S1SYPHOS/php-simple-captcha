@@ -3,13 +3,11 @@
 session_start();
 
 // Including the autoload (you need to composer install in the main directory)
-require_once __DIR__.'/../vendor/autoload.php';
-
-use SimpleCaptcha\Builder;
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Creating the captcha instance and setting the phrase in the session to store
 // it for check when the form is submitted
-$captcha = new Builder;
+$captcha = new SimpleCaptcha\Builder;
 $_SESSION['phrase'] = $captcha->phrase;
 
 // Setting the header to image jpeg because we here render an image

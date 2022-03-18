@@ -1,9 +1,7 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
-
-use SimpleCaptcha\Builder;
+require_once __DIR__ . '/../vendor/autoload.php';
 
 header('Content-type: image/jpeg');
 
-Builder::create()->build()->output();
+SimpleCaptcha\Builder::create()->build()->output();

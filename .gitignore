@@ -3,9 +3,9 @@
 /composer.lock
 
 # Temporary files
+.tmp
 /demo/*.jpg
 /demo/*.pgm
-/demo/temp/
 
 # Cache
 *.cache
