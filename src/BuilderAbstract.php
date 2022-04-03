@@ -104,13 +104,12 @@ abstract class BuilderAbstract
      */
 
     /**
-     * Builds random phrase
+     * Picks random character
      *
-     * @param int $length Number of characters
-     * @param string $charset Allowed characters
+     * @param string $charset Characters to choose from
      * @return string
      */
-    public static function buildPhrase(int $length = 5, ?string $charset = null): string
+    public static function randomCharacter(?string $charset = null): string
     {
         # Determine characters to use
         if (is_null($charset)) {
@@ -120,11 +119,24 @@ abstract class BuilderAbstract
         # Create charset array
         $characters = str_split($charset);
 
+        return $characters[array_rand($characters)];
+    }
+
+
+    /**
+     * Builds random phrase
+     *
+     * @param int $length Number of characters
+     * @param string $charset Characters to choose from
+     * @return string
+     */
+    public static function buildPhrase(int $length = 5, ?string $charset = null): string
+    {
         # Build random string
         $phrase = '';
 
         for ($i = 0; $i < $length; $i++) {
-            $phrase .= $characters[array_rand($characters)];
+            $phrase .= self::randomCharacter($charset);
         }
 
         return $phrase;

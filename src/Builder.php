@@ -150,6 +150,14 @@ class Builder extends BuilderAbstract
 
 
     /**
+     * Multiples of phrase length to be used for noise generation
+     *
+     * @var int
+     */
+    public int $noiseFactor = 2;
+
+
+    /**
      * Whether to apply post effects
      *
      * @var bool
@@ -266,19 +274,25 @@ class Builder extends BuilderAbstract
      */
     private function applyNoise(): void
     {
-        for ($i = 0; $i < 10; $i++) {
-            $color = imagecolorallocate($this->image, mt_rand(150, 225), mt_rand(150, 225), mt_rand(150, 225));
+		for ($i = 0; $i < Str::length($this->phrase) * $this->noiseFactor; $i++) {
+            # Determine random letter ..
+			$character = static::randomCharacter();
+            $font = $this->randomFont();
 
-            $x = mt_rand(-$this->width, $this->width);
-            $y = mt_rand(-$this->height, $this->height);
-            $symbol = static::$charset[mt_rand(0, Str::length(static::$charset) -1)];
+            # .. of random size & color, ..
+			$fontSize = mt_rand(5, 10);
+            $textColor = imagecolorallocate($this->image, mt_rand(0, 128), mt_rand(0, 128), mt_rand(0, 128));
 
-            for ($j = 0; $j < 5; $j++) {
-                # TODO: Create wrapper for `imagettftext` in order to
-                # replace all references of `imagettftext` & `imagestring`
-                imagestring($this->image, 5, $x, $y, $symbol, $color);
-            }
-        }
+            # .. random position ..
+            $x = mt_rand(0, $this->width);
+			$y = mt_rand(0, $this->height);
+
+            # .. random angle ..
+			$angle = mt_rand(-45, 45);
+
+            # .. and apply it
+			imagettftext($this->image, $fontSize, $angle, $x, $y, $textColor, $font, $character);
+		}
     }
 
 

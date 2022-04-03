@@ -316,6 +316,49 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    public function testRandomCharacter(): void
+    {
+        # Setup
+        # (1) Lengths
+        $fixtures = [
+            [
+                'charset' => 'abc',
+                'regex' => '/([abc])/',
+            ],
+            [
+                'charset' => '123',
+                'regex' => '/([123])/',
+            ],
+            [
+                'charset' => 'ABC',
+                'regex' => '/([ABC])/',
+            ],
+            [
+                'charset' => 'abcABC123',
+                'regex' => '/([abcABC123])/',
+            ],
+        ];
+
+        # Run function #1
+        $result1 = Builder::randomCharacter();
+        preg_match('/(\w)/', $result1, $expected1);
+
+        # Assert result
+        $this->assertEquals(Str::length($result1), 1);
+        $this->assertEquals($result1, $expected1[0]);
+
+        foreach ($fixtures as $fixture) {
+            # Run function #2
+            $result2 = Builder::randomCharacter($fixture['charset']);
+            preg_match($fixture['regex'], $result2, $expected2);
+
+            # Assert result
+            $this->assertEquals(Str::length($result2), 1);
+            $this->assertEquals($result2, $expected2[0]);
+        }
+    }
+
+
     public function testBuildPhrase(): void
     {
         # Setup
