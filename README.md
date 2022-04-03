@@ -114,6 +114,16 @@ if ($builder->compare($input)) {
 From there, the following functions are available:
 
 
+### `randomCharacter(string $charset = null): string`
+
+Picks random character (using given charset)
+
+
+### `buildPhrase(int $length = 5, string $charset = null): string`
+
+Builds random phrase (of given length using given charset)
+
+
 ### `build(int $width = 150, int $height = 40): self`
 
 Builds captcha image
@@ -222,6 +232,11 @@ Whether to apply any effects. Default: `true`
 ### `$builder->applyNoise (bool)`
 
 Whether to apply background noise (using random letters). Default: `true`
+
+
+### `$builder->noiseFactor (int)`
+
+Multiples of phrase length to be used for noise generation. Default: `2`
 
 
 ### `$builder->applyPostEffects (bool)`
