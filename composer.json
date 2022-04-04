@@ -3,7 +3,7 @@
     "description": "Simple captcha generator",
     "type": "library",
     "license": "MIT",
-    "version": "2.0.0-beta.3",
+    "version": "2.0.0-beta.4",
     "keywords": ["captcha", "anti-spam", "spam-protection", "spam", "obfuscation", "security", "anti-bot", "no-bot", "bot-protection"],
     "homepage": "https://codeberg.org/S1SYPHOS/php-simple-captcha",
     "scripts": {
