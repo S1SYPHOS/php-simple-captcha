@@ -2,6 +2,7 @@
 
 namespace SimpleCaptcha;
 
+use SimpleCaptcha\Helpers\A;
 use SimpleCaptcha\Helpers\F;
 use SimpleCaptcha\Helpers\Str;
 use SimpleCaptcha\Helpers\Mime;
@@ -288,21 +289,36 @@ abstract class BuilderAbstract
 
 
     /**
-     * Fetches color from image coordinates
+     * Checks whether RGB values are valid
+     *
+     * @param array $color RGB values
+     * @return void
+     * @throws Exception
+     */
+    public function validateColor(array $color): void
+    {
+        if (count($color) != 3) {
+            throw new Exception(sprintf('Invalid RGB colors: "%s"', A::join($color)));
+        }
+    }
+
+
+    /**
+     * Fetches color from image coordinates (= pixel)
      *
      * @param $image
      * @param int $x
      * @param int $y
-     * @param int $bgColor Background color
+     * @param int $code Color code fallback
      * @return int
      */
-    protected function getColor($image, int $x, int $y, int $bgColor): int
+    protected function pixel2int($image, int $x, int $y, int $code): int
     {
         $width = imagesx($image);
         $height = imagesy($image);
 
         if ($x < 0 || $x >= $width || $y < 0 || $y >= $height) {
-            return $bgColor;
+            return $code;
         }
 
         return imagecolorat($image, $x, $y);
@@ -310,17 +326,17 @@ abstract class BuilderAbstract
 
 
     /**
-     * Converts color identifier to RGB values
+     * Converts color code to RGB values
      *
-     * @param $color Color identifier
+     * @param $code Color code
      * @return array
      */
-    protected function getRGB(int $color): array
+    protected function int2rgb(int $code): array
     {
         return [
-            (int) ($color >> 16) & 0xff,
-            (int) ($color >> 8) & 0xff,
-            (int) ($color) & 0xff,
+            (int) ($code >> 16) & 0xff,
+            (int) ($code >> 8) & 0xff,
+            (int) ($code) & 0xff,
         ];
     }
 

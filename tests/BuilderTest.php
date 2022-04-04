@@ -107,12 +107,68 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildInvalidBackgroundImage(): void
     {
+        # Setup
+        $builder = Builder::create();
+
         # Assert exception
         $this->expectException(Exception::class);
 
         # Run function
-        $builder = new Builder;
         $builder->bgImage = 'not-existent.jpg';
+        $builder->build();
+    }
+
+
+    public function testBuildInvalidBgColor(): void
+    {
+        # Setup
+        $builder = Builder::create();
+
+        # Assert exception
+        $this->expectException(Exception::class);
+
+        # Run function
+        $builder->bgColor = [255, 255];
+        $builder->build();
+    }
+
+
+    public function testBuildInvalidLineColor(): void
+    {
+        # Setup
+        $builder = Builder::create();
+
+        # Assert exception
+        $this->expectException(Exception::class);
+
+        # Run function
+        $builder->lineColor = [255, 255];
+        $builder->build();
+    }
+
+
+    public function testBuildInvalidTextColor(): void
+    {
+        # Assert exception
+        $this->expectException(Exception::class);
+
+        # Run function #1
+        $builder = Builder::create();
+
+        $builder->textColor = [255, 255];
+        $builder->build();
+    }
+
+
+    public function testBuildInvalidFont(): void
+    {
+        # Assert exception
+        $this->expectException(Exception::class);
+
+        # Run function #1
+        $builder = Builder::create();
+
+        $builder->fonts = ['not-existent.ttf'];
         $builder->build();
     }
 

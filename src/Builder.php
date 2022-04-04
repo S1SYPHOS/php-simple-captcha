@@ -3,6 +3,7 @@
 namespace SimpleCaptcha;
 
 use SimpleCaptcha\Helpers\A;
+use SimpleCaptcha\Helpers\F;
 use SimpleCaptcha\Helpers\Dir;
 use SimpleCaptcha\Helpers\Str;
 use SimpleCaptcha\Helpers\Mime;
@@ -36,7 +37,7 @@ class Builder extends BuilderAbstract
     /**
      * Path to captcha font
      *
-     * @var string
+     * @var array
      */
 
     public ?array $fonts = null;
@@ -257,7 +258,10 @@ class Builder extends BuilderAbstract
                 mt_rand(100, 255),  # blue
             ];
 
-            # (2) Mix them up
+            # (2) Validate RGB values
+            $this->validateColor($mix);
+
+            # (3) Mix them up
             $color = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);
         }
 
@@ -297,13 +301,23 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Randomizes font file
+     * Picks random font file
      *
      * @return string
      */
     private function randomFont(): string
     {
-        return $this->fonts[mt_rand(0, count($this->fonts) - 1)];
+        # Pick random font file
+        $font = $this->fonts[mt_rand(0, count($this->fonts) - 1)];
+
+        # If it exists ..
+        if (F::exists($font)) {
+            # .. use it
+            return $font;
+        }
+
+        # .. fail otherwise
+        throw new Exception(sprintf('File does not exist: "%s"', $font));
     }
 
 
@@ -322,7 +336,7 @@ class Builder extends BuilderAbstract
 
         # Determine text size & start position
         $size = (int) round($this->width / $length) - mt_rand(0, 3) - 1;
-        $box = imagettfbbox($size, 0, $this->fonts[0], $this->phrase);
+        $box = imagettfbbox($size, 0, $font, $this->phrase);
         $textWidth = $box[2] - $box[0];
         $textHeight = $box[1] - $box[7];
         $x = (int) round(($this->width - $textWidth) / 2);
@@ -343,7 +357,10 @@ class Builder extends BuilderAbstract
                 mt_rand(0, 150),  # blue
             ];
 
-            # (b) Mix them up
+            # (b) Validate RGB values
+            $this->validateColor($mix);
+
+            # (c) Mix them up
             $textCode = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);
 
             # Fetch current character & determine its width
@@ -418,10 +435,10 @@ class Builder extends BuilderAbstract
      */
     private function interpolate(int $x, int $y, int $nw, int $ne, int $sw, int $se): int
     {
-        list($r0, $g0, $b0) = $this->getRGB($nw);
-        list($r1, $g1, $b1) = $this->getRGB($ne);
-        list($r2, $g2, $b2) = $this->getRGB($sw);
-        list($r3, $g3, $b3) = $this->getRGB($se);
+        list($r0, $g0, $b0) = $this->int2rgb($nw);
+        list($r1, $g1, $b1) = $this->int2rgb($ne);
+        list($r2, $g2, $b2) = $this->int2rgb($sw);
+        list($r3, $g3, $b3) = $this->int2rgb($se);
 
         $cx = 1.0 - $x;
         $cy = 1.0 - $y;
@@ -487,14 +504,14 @@ class Builder extends BuilderAbstract
                     $p = $this->interpolate(
                         $nX - floor($nX),
                         $nY - floor($nY),
-                        $this->getColor($this->image, floor($nX), floor($nY), $this->bgCode),
-                        $this->getColor($this->image, ceil($nX), floor($nY), $this->bgCode),
-                        $this->getColor($this->image, floor($nX), ceil($nY), $this->bgCode),
-                        $this->getColor($this->image, ceil($nX), ceil($nY), $this->bgCode)
+                        $this->pixel2int($this->image, floor($nX), floor($nY), $this->bgCode),
+                        $this->pixel2int($this->image, ceil($nX), floor($nY), $this->bgCode),
+                        $this->pixel2int($this->image, floor($nX), ceil($nY), $this->bgCode),
+                        $this->pixel2int($this->image, ceil($nX), ceil($nY), $this->bgCode)
                     );
 
                 } else {
-                    $p = $this->getColor($this->image, round($nX), round($nY), $this->bgCode);
+                    $p = $this->pixel2int($this->image, round($nX), round($nY), $this->bgCode);
                 }
 
                 if ($p == 0) {
@@ -551,7 +568,10 @@ class Builder extends BuilderAbstract
                     mt_rand(200, 255),  # blue
                 ];
 
-                # (2) Mix them up
+                # (2) Validate RGB values
+                $this->validateColor($mix);
+
+                # (3) Mix them up
                 $this->bgCode = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);
 
                 # Fill image
