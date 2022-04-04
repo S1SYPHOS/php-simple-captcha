@@ -76,8 +76,14 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         # (1) Default font files
         $defaultFonts = Dir::files(__DIR__ . '/../fonts', null, true);
 
-        # (2) Custom font files
-        $customFonts = Dir::files(__DIR__ . '/fixtures/fonts', ['License.txt', 'Readme+License.html'], true);
+        # (2) Create virtual directory
+        $root = vfsStream::setup('home');
+
+        # (3) Custom font files
+        $customFonts = [
+            vfsStream::url('home/example1.ttf'),
+            vfsStream::url('home/example2.ttf'),
+        ];
 
         # Assert defaults
         $this->assertEquals(array_map('realpath', self::$builder->fonts), array_map('realpath', $defaultFonts));
@@ -134,28 +140,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testBuildInvalidBgHex(): void
-    {
-        # Setup
-        $builder = Builder::create();
-
-        # Assert exception
-        $this->expectException(Exception::class);
-
-        # Run function #1
-        $builder->bgColor = '#zzz';
-        $builder->build();
-
-        # Run function #2
-        $builder->bgColor = '#zzzzzz';
-        $builder->build();
-
-        # Run function #3
-        $builder->bgColor = '#fafaf';
-        $builder->build();
-    }
-
-
     public function testBuildInvalidLineColor(): void
     {
         # Setup
@@ -170,28 +154,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testBuildInvalidLineHex(): void
-    {
-        # Setup
-        $builder = Builder::create();
-
-        # Assert exception
-        $this->expectException(Exception::class);
-
-        # Run function #1
-        $builder->lineColor = '#zzz';
-        $builder->build();
-
-        # Run function #2
-        $builder->lineColor = '#zzzzzz';
-        $builder->build();
-
-        # Run function #3
-        $builder->lineColor = '#fafaf';
-        $builder->build();
-    }
-
-
     public function testBuildInvalidTextColor(): void
     {
         # Setup
@@ -202,28 +164,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
         # Run function
         $builder->textColor = [255, 255];
-        $builder->build();
-    }
-
-
-    public function testBuildInvalidTextHex(): void
-    {
-        # Setup
-        $builder = Builder::create();
-
-        # Assert exception
-        $this->expectException(Exception::class);
-
-        # Run function #1
-        $builder->textColor = '#zzz';
-        $builder->build();
-
-        # Run function #2
-        $builder->textColor = '#zzzzzz';
-        $builder->build();
-
-        # Run function #3
-        $builder->textColor = '#fafaf';
         $builder->build();
     }
 
