@@ -119,7 +119,14 @@ abstract class BuilderAbstract
         # Create charset array
         $characters = str_split($charset);
 
-        return $characters[array_rand($characters)];
+        # Return random character
+        #
+        # Note: This provides same performance as `array_rand`, which uses `mt_rand` under the hood
+        # See https://www.php.net/manual/en/migration71.incompatible.php#migration71.incompatible.rand-srand-aliases
+        #
+        # For details on `rand` versus `mt_rand` performance,
+        # see https://stackoverflow.com/a/7808258
+        return $characters[mt_rand(0, count($characters) - 1)];
     }
 
 
