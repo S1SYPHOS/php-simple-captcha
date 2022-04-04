@@ -31,13 +31,6 @@ abstract class BuilderAbstract
     public string $phrase;
 
 
-    private static array $types = [
-        'gif' => 'image/gif',
-        'png' => 'image/png',
-        'jpg' => 'image/jpeg',
-    ];
-
-
     /**
      * Characters used for building random phrases
      *
@@ -176,28 +169,6 @@ abstract class BuilderAbstract
 
 
     /**
-     * Determines (and validates) MIME type
-     *
-     * @param string $file Image filepath
-     * @return string
-     * @throws \Exception
-     */
-    protected function getMIME(string $file): string
-    {
-        # Determine image MIME type
-        $mime = Mime::type($file);
-
-        # If not in allowed image MIME type list ..
-        if (!in_array($mime, array_values(self::$types))) {
-            # .. abort execution
-            throw new Exception(sprintf('Invalid MIME type: "%s". Allowed types are: %s', $mime, A::join($allowList, ', ')));
-        }
-
-        return $mime;
-    }
-
-
-    /**
      * Creates GD image object from file
      *
      * @param string $image
@@ -218,7 +189,7 @@ abstract class BuilderAbstract
             'image/gif' => 'imagecreatefromgif',
         ];
 
-        $mime = $this->getMIME($file);
+        $mime = Mime::type($file);
 
         if (in_array($mime, array_keys($methods))) {
             return $methods[$mime]($file);
