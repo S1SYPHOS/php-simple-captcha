@@ -2,8 +2,6 @@
 
 namespace SimpleCaptcha;
 
-use SimpleCaptcha\Helpers\F;
-
 use Exception;
 
 
@@ -21,7 +19,7 @@ class Toolkit
      *
      * @param string $color HEX color
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     public static function hex2rgb(string $color): array
     {

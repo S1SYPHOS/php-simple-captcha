@@ -10,7 +10,7 @@ use Exception;
 /**
  * Class BuilderTest
  *
- * Adds tests for class `Toolkit`
+ * Adds tests for class 'Toolkit'
  */
 class ToolkitTest extends \PHPUnit\Framework\TestCase
 {

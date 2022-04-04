@@ -39,7 +39,6 @@ class Builder extends BuilderAbstract
      *
      * @var array
      */
-
     public ?array $fonts = null;
 
 
@@ -218,6 +217,29 @@ class Builder extends BuilderAbstract
     public static function create(?string $phrase = null): self
     {
         return new self($phrase);
+    }
+
+
+    /**
+     * Determines (and validates) colors
+     *
+     * @param string|array $color Color values, either HEX (string) or RGB (array)
+     * @return array
+     * @throws \Exception
+     */
+    private function getColor($color): array
+    {
+        # If value represents RGB values ..
+        if (is_array($color)) {
+            # .. validate them
+            if (count($color) != 3) {
+                throw new Exception(sprintf('Invalid RGB colors: "%s"', A::join($color)));
+            }
+
+            return $color;
+        }
+
+        return Toolkit::hex2rgb($color);
     }
 
 
@@ -472,6 +494,23 @@ class Builder extends BuilderAbstract
 
 
     /**
+     * Fetches color of pixel at given coordinates
+     *
+     * @param int $x Horizontal position
+     * @param int $y Vertical position
+     * @return int
+     */
+    private function pixel2int(int $x, int $y): int
+    {
+        if ($x < 0 || $x >= $this->width || $y < 0 || $y >= $this->height) {
+            return $this->bgCode;
+        }
+
+        return imagecolorat($this->image, $x, $y);
+    }
+
+
+    /**
      * Distorts image
      *
      * @return void
@@ -516,14 +555,14 @@ class Builder extends BuilderAbstract
                     $p = $this->interpolate(
                         $nX - floor($nX),
                         $nY - floor($nY),
-                        $this->pixel2int($this->image, floor($nX), floor($nY), $this->bgCode),
-                        $this->pixel2int($this->image, ceil($nX), floor($nY), $this->bgCode),
-                        $this->pixel2int($this->image, floor($nX), ceil($nY), $this->bgCode),
-                        $this->pixel2int($this->image, ceil($nX), ceil($nY), $this->bgCode)
+                        $this->pixel2int(floor($nX), floor($nY)),
+                        $this->pixel2int(ceil($nX), floor($nY)),
+                        $this->pixel2int(floor($nX), ceil($nY)),
+                        $this->pixel2int(ceil($nX), ceil($nY))
                     );
 
                 } else {
-                    $p = $this->pixel2int($this->image, round($nX), round($nY), $this->bgCode);
+                    $p = $this->pixel2int(round($nX), round($nY));
                 }
 
                 if ($p == 0) {
@@ -649,6 +688,124 @@ class Builder extends BuilderAbstract
 
 
     /**
+     * Creates image file suitable for use with OCR software
+     *
+     * See https://priteshgupta.com/2011/09/advanced-image-functions-using-php
+     * See https://github.com/raoulduke/phpocrad
+     *
+     * @param string $file Output file
+     * @param int $amount
+     * @param int $threshold
+     * @return void
+     */
+    private function img2ocr(?string $output = null, int $amount = 80, int $threshold = 3): void
+    {
+        $image = $this->image;
+
+        $canvas = imagecreatetruecolor($this->width, $this->height);
+        $blurred = imagecreatetruecolor($this->width, $this->height);
+
+        # Apply gaussian blur matrix
+        $matrix = [
+            [1, 2, 1],
+            [2, 4, 2],
+            [1, 2, 1],
+        ];
+
+        imagecopy($blurred, $image, 0, 0, 0, 0, $this->width, $this->height);
+        imageconvolution($blurred, $matrix, 16, 0);
+
+        if ($threshold > 0) {
+            # Calculate the difference between the blurred pixels and the original
+            # and set the pixels
+            for ($x = 0; $x < $this->width - 1; $x++) {  # each row
+                for ($y = 0; $y < $this->height; $y++) { # each pixel
+                    $rgbOrig = imagecolorat($image, $x, $y);
+
+                    $rOrig = (($rgbOrig >> 16) & 0xFF);
+                    $gOrig = (($rgbOrig >> 8) & 0xFF);
+                    $bOrig = ($rgbOrig & 0xFF);
+
+                    $rgbBlur = imagecolorat($blurred, $x, $y);
+
+                    $rBlur = (($rgbBlur >> 16) & 0xFF);
+                    $gBlur = (($rgbBlur >> 8) & 0xFF);
+                    $bBlur = ($rgbBlur & 0xFF);
+
+                    # When the masked pixels differ less from the original
+                    # than the threshold specifies, they are set to their original value.
+                    $rNew = (abs($rOrig - $rBlur) >= $threshold)
+                        ? max(0, min(255, ($amount * ($rOrig - $rBlur)) + $rOrig))
+                        : $rOrig;
+                    $gNew = (abs($gOrig - $gBlur) >= $threshold)
+                        ? max(0, min(255, ($amount * ($gOrig - $gBlur)) + $gOrig))
+                        : $gOrig;
+                    $bNew = (abs($bOrig - $bBlur) >= $threshold)
+                        ? max(0, min(255, ($amount * ($bOrig - $bBlur)) + $bOrig))
+                        : $bOrig;
+
+                    if (($rOrig != $rNew) || ($gOrig != $gNew) || ($bOrig != $bNew)) {
+                        $pixCol = ImageColorAllocate($image, $rNew, $gNew, $bNew);
+                        imagesetpixel($image, $x, $y, $pixCol);
+                    }
+                }
+            }
+        }
+
+        else {
+            for ($x = 0; $x < $this->width; $x++) { # each row
+                for ($y = 0; $y < $this->height; $y++) { # each pixel
+                    $rgbOrig = imagecolorat($image, $x, $y);
+
+                    $rOrig = (($rgbOrig >> 16) & 0xFF);
+                    $gOrig = (($rgbOrig >> 8) & 0xFF);
+                    $bOrig = ($rgbOrig & 0xFF);
+
+                    $rgbBlur = imagecolorat($blurred, $x, $y);
+
+                    $rBlur = (($rgbBlur >> 16) & 0xFF);
+                    $gBlur = (($rgbBlur >> 8) & 0xFF);
+                    $bBlur = ($rgbBlur & 0xFF);
+
+                    $rNew = ($amount * ($rOrig - $rBlur)) + $rOrig;
+                        if ($rNew > 255) { $rNew = 255; }
+                        elseif ($rNew < 0) { $rNew = 0; }
+                    $gNew = ($amount * ($gOrig - $gBlur)) + $gOrig;
+                        if ($gNew > 255) { $gNew = 255; }
+                        elseif ($gNew < 0) { $gNew = 0; }
+                    $bNew = ($amount * ($bOrig - $bBlur)) + $bOrig;
+                        if ($bNew > 255) { $bNew = 255; }
+                        elseif ($bNew < 0) { $bNew = 0; }
+                    $rgbNew = ($rNew << 16) + ($gNew << 8) + $bNew;
+
+                    imagesetpixel($image, $x, $y, $rgbNew);
+                }
+            }
+        }
+
+        # Remove temporary image data
+        imagedestroy($canvas);
+        imagedestroy($blurred);
+
+        # Create PGM file (grayscale)
+        $pgm = 'P5 ' . $this->width . ' ' . $this->height . ' 255' . "\n";
+
+        for ($y = 0; $y < $this->height; $y++) {
+            for ($x = 0; $x < $this->width; $x++) {
+                $colors = imagecolorsforindex($image, imagecolorat($image, $x, $y));
+                $pgm .= chr(0.3 * $colors['red'] + 0.59 * $colors['green'] + 0.11 * $colors['blue']);
+            }
+        }
+
+        if (empty($output)) {
+            $output = sprintf('%s/%s.pgm', F::dirname($file), F::name($file));
+        }
+
+        F::write($output, $pgm);
+    }
+
+
+    /**
      * Checks whether captcha image may be solved through OCR
      *
      * @param string $tmpDir Directory
@@ -683,7 +840,7 @@ class Builder extends BuilderAbstract
         $pgmFile = sprintf('%s/%s.pgm', $tmpDir, uniqid('captcha'));
 
         # Create captcha image & convert to grayscale
-        $this->img2ocr($this->image, $pgmFile);
+        $this->img2ocr($pgmFile);
 
         # Create data array for possible matches
         $outputs = [];
@@ -733,6 +890,82 @@ class Builder extends BuilderAbstract
         } while ($this->isOCRReadable());
 
         return $this;
+    }
+
+
+    /**
+     * Creates GD image object from file
+     *
+     * @param string $image
+     * @return resource|GdImage
+     * @throws \Exception
+     */
+    protected function img2gd(string $file)
+    {
+        # If file does not exist ..
+        if (!F::exists($file)) {
+            # .. fail early
+            throw new Exception(sprintf('File does not exist: "%s"', F::filename($file)));
+        }
+
+        $methods = [
+            'image/jpeg' => 'imagecreatefromjpeg',
+            'image/png' => 'imagecreatefrompng',
+            'image/gif' => 'imagecreatefromgif',
+        ];
+
+        $mime = Mime::type($file);
+
+        if (in_array($mime, array_keys($methods))) {
+            return $methods[$mime]($file);
+        }
+
+        throw new Exception(sprintf('MIME type "%s" not supported!', $mime));
+    }
+
+
+    /**
+     * Creates image content from GD image object
+     *
+     * @param int $quality Captcha image quality
+     * @param string $filename Output filepath
+     * @param string $type Captcha image output format
+     * @return void
+     * @throws \Exception
+     */
+    protected function gd2img(int $quality = 90, ?string $filename = null, string $type = 'jpg'): void
+    {
+        # Convert filetype to lowercase
+        $type = Str::lower($type);
+
+        # If filename is given ..
+        if (!is_null($filename)) {
+            # .. determine filetype from it
+            $type = F::extension($filename);
+        }
+
+        if ($type == 'gif') {
+            imagegif($this->image, $filename);
+        }
+
+        elseif ($type == 'jpg') {
+            imagejpeg($this->image, $filename, $quality);
+        }
+
+        elseif ($type == 'png') {
+            # Normalize quality
+            if ($quality > 9) {
+                $quality = -1;
+            }
+
+            imagepng($this->image, $filename, $quality);
+        }
+
+        # .. otherwise ..
+        else {
+            # .. abort execution
+            throw new Exception(sprintf('File type "%s" not supported!', $type));
+        }
     }
 
 
