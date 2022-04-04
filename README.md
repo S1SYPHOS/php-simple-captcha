@@ -259,6 +259,18 @@ Whether to use random font for each symbol. Default: `true`
 Have a look at the examples inside the `demo` folder, which should give you an impression of what's possible.
 
 
+## Fonts
+
+The `fonts` directory includes:
+
+- [Bitter](https://www.solmatas.com/bitter) (licensed under [OFL](https://scripts.sil.org/OFL))
+- [Gidole](https://gidole.github.io) (licensed under [MIT](https://github.com/larsenwork/Gidole/blob/master/Resources/GidoleFont/License.txt))
+- [Hack](https://sourcefoundry.org/hack) (licensed under [MIT](https://github.com/source-foundry/Hack/blob/master/LICENSE.md))
+- [Linux Libertine](https://libertine-fonts.org) (licensed under [OFL](https://scripts.sil.org/OFL))
+- [TGL 0-17](http://www.peter-wiegel.de/TGL_0-16.html) (licensed under [OFL](https://scripts.sil.org/OFL))
+- [Vollkorn](http://vollkorn-typeface.com) (licensed under [OFL](https://scripts.sil.org/OFL))
+
+
 ## Credits
 
 This library is based on [`Gregwar/Captcha`](https://github.com/Gregwar/Captcha), introducing several new features & bug fixes.

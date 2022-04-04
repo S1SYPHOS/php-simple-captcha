@@ -9,3 +9,7 @@
 
 # Cache
 *.cache
+
+# Font downloads
+/*.tgz
+/*.zip
