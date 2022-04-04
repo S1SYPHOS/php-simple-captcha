@@ -330,18 +330,36 @@ class Builder extends BuilderAbstract
 
         # Write individual letters ..
         for ($i = 0; $i < $length; $i++) {
-            # .. using random font (if enabled)
+            # (1) .. using random font (if enabled)
             if ($this->randomizeFonts) {
                 $font = $this->randomFont();
             }
 
-            $symbol = Str::substr($this->phrase, $i, 1);
-            $box = imagettfbbox($size, 0, $font, $symbol);
-            $w = $box[2] - $box[0];
+            # (2) .. using random text color (if enabled)
+            # (a) Determine colors to be mixed
+            $mix = $this->textColor ?? [
+                mt_rand(0, 150),  # red
+                mt_rand(0, 150),  # green
+                mt_rand(0, 150),  # blue
+            ];
+
+            # (b) Mix them up
+            $textCode = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);
+
+            # Fetch current character & determine its width
+            $char = Str::substr($this->phrase, $i, 1);
+            $box = imagettfbbox($size, 0, $font, $char);
+            $charWidth = $box[2] - $box[0];
+
+            # Randomize angle & offset
             $angle = mt_rand(-$this->maxAngle, $this->maxAngle);
             $offset = mt_rand(-$this->maxOffset, $this->maxOffset);
-            imagettftext($this->image, $size, $angle, $x, $y + $offset, $this->textCode, $font, $symbol);
-            $x += $w;
+
+            # Draw character
+            imagettftext($this->image, $size, $angle, $x, $y + $offset, $textCode, $font, $char);
+
+            # Move along
+            $x += $charWidth;
         }
     }
 
@@ -565,17 +583,6 @@ class Builder extends BuilderAbstract
             }
         }
 
-        # Assign text color
-        # (1) Determine colors to be mixed
-        $mix = $this->textColor ?? [
-            mt_rand(0, 150),  # red
-            mt_rand(0, 150),  # green
-            mt_rand(0, 150),  # blue
-        ];
-
-        # (2) Mix them up
-        $this->textCode = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);
-
         # Write captcha phrase & returns its color code
         $this->writePhrase();
 
@@ -590,7 +597,7 @@ class Builder extends BuilderAbstract
 
             if ($this->maxLinesFront !== 0) {
                 for ($e = 0; $e < $effects; $e++) {
-                    $this->drawLine($this->textCode);
+                    $this->drawLine();
                 }
             }
 
