@@ -3,7 +3,7 @@
 
 ![Example captcha images](examples.png)
 
-`php-simple-captcha` creates & verifies captcha images, dependency-free & respecting your user's privacy.
+`php-simple-captcha` creates & verifies captcha images, dependency-free & respecting your user's privacy. It's a fork of [`Gregwar/Captcha`](https://github.com/Gregwar/Captcha), but supports modern PHP versions and comes with several new features & bug fixes.
 
 
 ## Installation
