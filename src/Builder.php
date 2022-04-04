@@ -95,9 +95,10 @@ class Builder extends BuilderAbstract
      * Background color, either ..
      *
      * (1) .. RGB values (array)
-     * (2) .. 'transparent' (string)
+     * (2) .. HEX value (string)
+     * (3) .. 'transparent' (string)
      *
-     * @var null|string|array
+     * @var array|string
      */
     public $bgColor = null;
 
@@ -111,19 +112,25 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Line color RGB values
+     * Line color RGB values, either ..
      *
-     * @var array
+     * (1) .. RGB values (array)
+     * (2) .. HEX value (string)
+     *
+     * @var array|string
      */
-    public ?array $lineColor = null;
+    public $lineColor = null;
 
 
     /**
-     * Text color RGB values
+     * Text color RGB values, either ..
      *
-     * @var array
+     * (1) .. RGB values (array)
+     * (2) .. HEX value (string)
+     *
+     * @var array|string
      */
-    public ?array $textColor = null;
+    public $textColor = null;
 
 
     /**
@@ -248,8 +255,8 @@ class Builder extends BuilderAbstract
                 mt_rand(100, 255),  # blue
             ];
 
-            # (2) Validate RGB values
-            $this->validateColor($mix);
+            # (2) Normalize RGB values
+            $mix = $this->getColor($mix);
 
             # (3) Mix them up
             $color = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);
@@ -347,8 +354,8 @@ class Builder extends BuilderAbstract
                 mt_rand(0, 150),  # blue
             ];
 
-            # (b) Validate RGB values
-            $this->validateColor($mix);
+            # (b) Normalize RGB values
+            $mix = $this->getColor($mix);
 
             # (c) Mix them up
             $textCode = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);
@@ -558,8 +565,8 @@ class Builder extends BuilderAbstract
                     mt_rand(200, 255),  # blue
                 ];
 
-                # (2) Validate RGB values
-                $this->validateColor($mix);
+                # (2) Normalize RGB values
+                $mix = $this->getColor($mix);
 
                 # (3) Mix them up
                 $this->bgCode = imagecolorallocate($this->image, $mix[0], $mix[1], $mix[2]);

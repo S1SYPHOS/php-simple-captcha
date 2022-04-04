@@ -134,6 +134,28 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    public function testBuildInvalidBgHex(): void
+    {
+        # Setup
+        $builder = Builder::create();
+
+        # Assert exception
+        $this->expectException(Exception::class);
+
+        # Run function #1
+        $builder->bgColor = '#zzz';
+        $builder->build();
+
+        # Run function #2
+        $builder->bgColor = '#zzzzzz';
+        $builder->build();
+
+        # Run function #3
+        $builder->bgColor = '#fafaf';
+        $builder->build();
+    }
+
+
     public function testBuildInvalidLineColor(): void
     {
         # Setup
@@ -148,27 +170,73 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testBuildInvalidTextColor(): void
+    public function testBuildInvalidLineHex(): void
     {
+        # Setup
+        $builder = Builder::create();
+
         # Assert exception
         $this->expectException(Exception::class);
 
         # Run function #1
+        $builder->lineColor = '#zzz';
+        $builder->build();
+
+        # Run function #2
+        $builder->lineColor = '#zzzzzz';
+        $builder->build();
+
+        # Run function #3
+        $builder->lineColor = '#fafaf';
+        $builder->build();
+    }
+
+
+    public function testBuildInvalidTextColor(): void
+    {
+        # Setup
         $builder = Builder::create();
 
+        # Assert exception
+        $this->expectException(Exception::class);
+
+        # Run function
         $builder->textColor = [255, 255];
+        $builder->build();
+    }
+
+
+    public function testBuildInvalidTextHex(): void
+    {
+        # Setup
+        $builder = Builder::create();
+
+        # Assert exception
+        $this->expectException(Exception::class);
+
+        # Run function #1
+        $builder->textColor = '#zzz';
+        $builder->build();
+
+        # Run function #2
+        $builder->textColor = '#zzzzzz';
+        $builder->build();
+
+        # Run function #3
+        $builder->textColor = '#fafaf';
         $builder->build();
     }
 
 
     public function testBuildInvalidFont(): void
     {
+        # Setup
+        $builder = Builder::create();
+
         # Assert exception
         $this->expectException(Exception::class);
 
-        # Run function #1
-        $builder = Builder::create();
-
+        # Run function
         $builder->fonts = ['not-existent.ttf'];
         $builder->build();
     }

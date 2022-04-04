@@ -289,17 +289,59 @@ abstract class BuilderAbstract
 
 
     /**
-     * Checks whether RGB values are valid
+     * Converts color values from HEX to RGB
      *
-     * @param array $color RGB values
-     * @return void
+     * See https://stackoverflow.com/a/31934345
+     *
+     * @param string $color HEX color
+     * @return array
      * @throws Exception
      */
-    public function validateColor(array $color): void
+    public function hex2rgb(string $color): array
     {
-        if (count($color) != 3) {
-            throw new Exception(sprintf('Invalid RGB colors: "%s"', A::join($color)));
+        $hex = str_replace('#', '', $color);
+        $length = strlen($hex);
+
+        if ($length == 3 && preg_match('/^[a-f0-9]{3}$/i', $hex)) {
+            return [
+                hexdec(str_repeat(substr($hex, 0, 1), 2)),
+                hexdec(str_repeat(substr($hex, 1, 1), 2)),
+                hexdec(str_repeat(substr($hex, 2, 1), 2)),
+            ];
         }
+
+        if ($length == 6 && preg_match('/^[a-f0-9]{6}$/i', $hex)) {
+            return [
+                hexdec(substr($hex, 0, 2)),
+                hexdec(substr($hex, 2, 2)),
+                hexdec(substr($hex, 4, 2)),
+            ];
+        }
+
+        throw new Exception(sprintf('Invalid HEX color: "%s"', $color));
+    }
+
+
+    /**
+     * Determines (and validates) colors
+     *
+     * @param string|array $color Color values, either HEX (string) or RGB (array)
+     * @return array
+     * @throws Exception
+     */
+    public function getColor($color): array
+    {
+        # If value represents RGB values ..
+        if (is_array($color)) {
+            # .. validate them
+            if (count($color) != 3) {
+                throw new Exception(sprintf('Invalid RGB colors: "%s"', A::join($color)));
+            }
+
+            return $color;
+        }
+
+        return $this->hex2rgb($color);
     }
 
 
