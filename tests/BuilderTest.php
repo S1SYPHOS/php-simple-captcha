@@ -15,7 +15,7 @@ use Exception;
 /**
  * Class BuilderTest
  *
- * Adds tests for class `BuilderTest`
+ * Adds tests for class `Builder`
  */
 class BuilderTest extends \PHPUnit\Framework\TestCase
 {

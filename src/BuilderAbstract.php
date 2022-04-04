@@ -176,21 +176,6 @@ abstract class BuilderAbstract
 
 
     /**
-     * Makes image background transparent
-     *
-     * @param resource|GdImage $image
-     * @return void
-     */
-    protected function addTransparency($image): void
-    {
-        imagealphablending($image, false);
-        $transparency = imagecolorallocatealpha($image, 0, 0, 0, 127);
-        imagefill($image, 0, 0, $transparency);
-        imagesavealpha($image, true);
-    }
-
-
-    /**
      * Determines (and validates) MIME type
      *
      * @param string $file Image filepath
@@ -289,40 +274,6 @@ abstract class BuilderAbstract
 
 
     /**
-     * Converts color values from HEX to RGB
-     *
-     * See https://stackoverflow.com/a/31934345
-     *
-     * @param string $color HEX color
-     * @return array
-     * @throws Exception
-     */
-    public function hex2rgb(string $color): array
-    {
-        $hex = str_replace('#', '', $color);
-        $length = strlen($hex);
-
-        if ($length == 3 && preg_match('/^[a-f0-9]{3}$/i', $hex)) {
-            return [
-                hexdec(str_repeat(substr($hex, 0, 1), 2)),
-                hexdec(str_repeat(substr($hex, 1, 1), 2)),
-                hexdec(str_repeat(substr($hex, 2, 1), 2)),
-            ];
-        }
-
-        if ($length == 6 && preg_match('/^[a-f0-9]{6}$/i', $hex)) {
-            return [
-                hexdec(substr($hex, 0, 2)),
-                hexdec(substr($hex, 2, 2)),
-                hexdec(substr($hex, 4, 2)),
-            ];
-        }
-
-        throw new Exception(sprintf('Invalid HEX color: "%s"', $color));
-    }
-
-
-    /**
      * Determines (and validates) colors
      *
      * @param string|array $color Color values, either HEX (string) or RGB (array)
@@ -341,7 +292,7 @@ abstract class BuilderAbstract
             return $color;
         }
 
-        return $this->hex2rgb($color);
+        return Toolkit::hex2rgb($color);
     }
 
 
@@ -368,23 +319,7 @@ abstract class BuilderAbstract
 
 
     /**
-     * Converts color code to RGB values
-     *
-     * @param $code Color code
-     * @return array
-     */
-    protected function int2rgb(int $code): array
-    {
-        return [
-            (int) ($code >> 16) & 0xff,
-            (int) ($code >> 8) & 0xff,
-            (int) ($code) & 0xff,
-        ];
-    }
-
-
-    /**
-     * Converts image for better use with OCR software
+     * Creates image suitable for use with OCR software
      *
      * See https://priteshgupta.com/2011/09/advanced-image-functions-using-php
      * See https://github.com/raoulduke/phpocrad
@@ -392,11 +327,10 @@ abstract class BuilderAbstract
      * @param string $image Captcha image
      * @param string $file Output file
      * @param int $amount
-     * @param int $radius
      * @param int $threshold
      * @return void
      */
-    protected function img2ocr($image, ?string $output = null, int $amount = 80, int $radius = 1, int $threshold = 3): void
+    protected function img2ocr($image, ?string $output = null, int $amount = 80, int $threshold = 3): void
     {
         $width = imagesx($image);
         $height = imagesy($image);

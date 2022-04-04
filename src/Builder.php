@@ -432,10 +432,10 @@ class Builder extends BuilderAbstract
      */
     private function interpolate(int $x, int $y, int $nw, int $ne, int $sw, int $se): int
     {
-        list($r0, $g0, $b0) = $this->int2rgb($nw);
-        list($r1, $g1, $b1) = $this->int2rgb($ne);
-        list($r2, $g2, $b2) = $this->int2rgb($sw);
-        list($r3, $g3, $b3) = $this->int2rgb($se);
+        list($r0, $g0, $b0) = Toolkit::int2rgb($nw);
+        list($r1, $g1, $b1) = Toolkit::int2rgb($ne);
+        list($r2, $g2, $b2) = Toolkit::int2rgb($sw);
+        list($r3, $g3, $b3) = Toolkit::int2rgb($se);
 
         $cx = 1.0 - $x;
         $cy = 1.0 - $y;
@@ -453,6 +453,21 @@ class Builder extends BuilderAbstract
         $b  = (int) ($cy * $m0 + $y * $m1);
 
         return ($r << 16) | ($g << 8) | $b;
+    }
+
+
+    /**
+     * Makes image background transparent
+     *
+     * @param resource|GdImage $image
+     * @return void
+     */
+    private function addTransparency($image): void
+    {
+        imagealphablending($image, false);
+        $transparency = imagecolorallocatealpha($image, 0, 0, 0, 127);
+        imagefill($image, 0, 0, $transparency);
+        imagesavealpha($image, true);
     }
 
 
