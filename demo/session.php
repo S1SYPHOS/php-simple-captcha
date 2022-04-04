@@ -1,17 +1,16 @@
 <?php
-// We need the session to store the correct phrase for later check
-session_start();
 
-// Including the autoload (you need to composer install in the main directory)
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Creating the captcha instance and setting the phrase in the session to store
-// it for check when the form is submitted
-$captcha = new SimpleCaptcha\Builder;
+use SimpleCaptcha\Builder;
+use SimpleCaptcha\Helpers\Mime;
+
+# Start session & store phrase in session,
+# so you can check it after form submission
+session_start();
+$captcha = Builder::create();
 $_SESSION['phrase'] = $captcha->phrase;
 
-// Setting the header to image jpeg because we here render an image
-header('Content-Type: image/jpeg');
-
-// Running the actual rendering of the captcha image
+# Render captcha image (using correct header)
+header('Content-type: ' . Mime::fromExtension('jpg'));
 $captcha->build()->output();

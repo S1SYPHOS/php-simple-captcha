@@ -256,7 +256,17 @@ Whether to use random font for each symbol. Default: `true`
 
 ## Examples
 
-Have a look at the examples inside the `demo` folder, which should give you an impression of what's possible.
+Have a look at the examples inside the `demo` folder, which should give you an impression of what's possible - or simply whip up a PHP development server:
+
+```bash
+# Change directory
+cd demo
+
+# Launch server
+php -S localhost:3000
+
+# All examples are now available in your browser, eg 'http://localhost:3000/ocr.php'
+```
 
 
 ## Fonts

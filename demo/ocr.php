@@ -3,33 +3,46 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use SimpleCaptcha\Builder;
+use SimpleCaptcha\Helpers\Dir;
+use SimpleCaptcha\Helpers\F;
 
-/**
- * Generates 1000 captchas and try to read their code with the
- * ocrad OCR
- */
+# Create temporary directory
+Dir::make('tmp');
 
-$tests = 10000;
+# Remove previously solved captcha images
+foreach (Dir::files('tmp') as $file) {
+    F::remove($file);
+}
+
+echo '<h1>OCR Captcha</h1>';
+
+# Determine OCR success rate solving 100 captcha images
+$total = 100;
 $passed = 0;
 
-shell_exec('rm passed*.jpg');
-
-for ($i=0; $i<$tests; $i++) {
-    echo "Captcha $i/$tests... ";
+for ($i = 0; $i < $total; $i++) {
+    echo sprintf('Captcha %s/%s ..', $i + 1, $total);
 
     $captcha = new Builder;
-    $captcha->setDistortion(false)->build();
+    $captcha->distortion = false;
+    $captcha->build();
 
     if ($captcha->isOCRReadable()) {
         $passed++;
-        $captcha->save("passed$passed.jpg");
-        echo "passed at ocr... ";
-    } else {
-        echo "failed... ";
+
+        # Store solved captcha image
+        $captcha->save("tmp/passed-$passed.jpg");
+
+        echo ' passed!<br>';
     }
 
-    echo "pass rate: ".round(100*$passed/($i+1),2)."%\n";
+    else {
+        echo ' failed!<br>';
+    }
+
+    $rate = round(100 * $passed / ($i + 1), 2);
+    echo "Current pass rate: $rate %<br><br>";
 }
 
-echo "\n";
-echo "Over, $passed/$tests readed with OCR\n";
+echo '<br>';
+echo sprintf('Result: %s/%s solved through OCR!', $passed, $total);

@@ -2,6 +2,9 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-header('Content-type: image/jpeg');
+use SimpleCaptcha\Builder;
+use SimpleCaptcha\Helpers\Mime;
 
-SimpleCaptcha\Builder::create()->build()->output();
+# Render captcha image (using correct header)
+header('Content-type: ' . Mime::fromExtension('jpg'));
+Builder::create()->build()->output();
