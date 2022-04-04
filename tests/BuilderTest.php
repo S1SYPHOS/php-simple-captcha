@@ -83,7 +83,8 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array_map('realpath', self::$builder->fonts), array_map('realpath', $defaultFonts));
 
         # Run function
-        $builder = Builder::create(null, $customFonts);
+        $builder = Builder::create();
+        $builder->fonts = $customFonts;
 
         # Assert funtion
         $this->assertEquals(array_map('realpath', $builder->fonts), array_map('realpath', $customFonts));

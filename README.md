@@ -51,11 +51,6 @@ $builder = new Builder($phrase);
 
 # (2) .. or this way
 $builder = Builder::create($phrase);
-
-# You may also pass
-# - a single font filepath (as string) or
-# - multiple at once (array)
-$builder = Builder::create($phrase, $fonts);
 ```
 
 From here, you can ..

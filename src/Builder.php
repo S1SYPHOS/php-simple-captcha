@@ -186,24 +186,15 @@ class Builder extends BuilderAbstract
      * Constructor
      *
      * @param string $phrase Captcha phrase
-     * @param array $fonts Font files
      * @return void
      */
-    public function __construct(?string $phrase = null, ?array $fonts = null)
+    public function __construct(?string $phrase = null)
     {
         # Build random phrase if missing input or empty string
         $this->phrase = $phrase ?: $this->buildPhrase();
 
-        # Determine fonts to choose from, allowing to ..
-        if (is_null($fonts)) {
-            # .. fallback to default fonts
-            $this->fonts = Dir::files(__DIR__ . '/../fonts', null, true);
-        }
-
-        else {
-            # .. use single filepaths & arrays alike
-            $this->fonts = (array) $fonts;
-        }
+        # Fetch default font files
+        $this->fonts = Dir::files(__DIR__ . '/../fonts', null, true);
     }
 
 
@@ -215,12 +206,11 @@ class Builder extends BuilderAbstract
      * Instantiates 'CaptchaBuilder' object
      *
      * @param string $phrase Captcha phrase
-     * @param array $fonts Font files
      * @return self
      */
-    public static function create(?string $phrase = null, ?array $fonts = null): self
+    public static function create(?string $phrase = null): self
     {
-        return new self($phrase, $fonts);
+        return new self($phrase);
     }
 
 
