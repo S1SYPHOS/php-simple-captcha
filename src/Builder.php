@@ -35,7 +35,7 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Path to captcha font
+     * Path to captcha font(s)
      *
      * @var array
      */
@@ -111,7 +111,7 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Line color RGB values, either ..
+     * Line color, either ..
      *
      * (1) .. RGB values (array)
      * (2) .. HEX value (string)
@@ -122,7 +122,7 @@ class Builder extends BuilderAbstract
 
 
     /**
-     * Text color RGB values, either ..
+     * Text color, either ..
      *
      * (1) .. RGB values (array)
      * (2) .. HEX value (string)

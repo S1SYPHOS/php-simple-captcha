@@ -152,7 +152,8 @@ abstract class BuilderAbstract
     /**
      * Checks whether captcha was solved correctly
      *
-     * @param string $phrase
+     * @param string $phrase Phrase to be tested
+     * @param string $string Phrase to be tested against (optional)
      * @return bool
      */
     public function compare(string $phrase, ?string $string = null): bool
