@@ -199,19 +199,19 @@ Maximum character angle. Default: `8`
 Maximum character offset. Default: `5`
 
 
-### `$builder->bgColor (string|array)`
+### `$builder->bgColor (array|string)`
 
-Background color, either RGB values (array) or `'transparent'` (string). Default: random
-
-
-### `$builder->lineColor (array)`
-
-Line color RGB values
+Background color, either RGB values (array), HEX value or `'transparent'` (string). Default: random
 
 
-### `$builder->textColor (array)`
+### `$builder->lineColor (array|string)`
 
-Text color RGB values
+Line color RGB values (array) or HEX value (string)
+
+
+### `$builder->textColor (array|string)`
+
+Text color RGB values (array) or HEX value (string)
 
 
 ### `$builder->bgImage (string)`
