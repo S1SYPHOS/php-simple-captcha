@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleCaptcha;
 
 use SimpleCaptcha\Helpers\A;
@@ -354,12 +356,12 @@ class Builder extends BuilderAbstract
         $font = $this->randomFont();
 
         # Determine text size & start position
-        $size = (int) round($this->width / $length) - mt_rand(0, 3) - 1;
+        $size = $this->round($this->width / $length) - mt_rand(0, 3) - 1;
         $box = imagettfbbox($size, 0, $font, $this->phrase);
         $textWidth = $box[2] - $box[0];
         $textHeight = $box[1] - $box[7];
-        $x = (int) round(($this->width - $textWidth) / 2);
-        $y = (int) round(($this->height - $textHeight) / 2) + $size;
+        $x = $this->round(($this->width - $textWidth) / 2);
+        $y = $this->round(($this->height - $textHeight) / 2) + $size;
 
         # Write individual letters ..
         for ($i = 0; $i < $length; $i++) {
@@ -496,17 +498,17 @@ class Builder extends BuilderAbstract
     /**
      * Fetches color of pixel at given coordinates
      *
-     * @param int $x Horizontal position
-     * @param int $y Vertical position
+     * @param float|int $x Horizontal position (or an estimation thereof)
+     * @param float|int $y Vertical position (or an estimation thereof)
      * @return int
      */
-    private function pixel2int(int $x, int $y): int
+    private function pixel2int($x, $y): int
     {
         if ($x < 0 || $x >= $this->width || $y < 0 || $y >= $this->height) {
             return $this->bgCode;
         }
 
-        return imagecolorat($this->image, $x, $y);
+        return imagecolorat($this->image, $this->round($x), $this->round($y));
     }
 
 
@@ -553,8 +555,8 @@ class Builder extends BuilderAbstract
 
                 if ($this->interpolate && $this->bgColor != 'transparent') {
                     $p = $this->interpolate(
-                        $nX - floor($nX),
-                        $nY - floor($nY),
+                        $this->round($nX - floor($nX)),
+                        $this->round($nY - floor($nY)),
                         $this->pixel2int(floor($nX), floor($nY)),
                         $this->pixel2int(ceil($nX), floor($nY)),
                         $this->pixel2int(floor($nX), ceil($nY)),
@@ -562,7 +564,7 @@ class Builder extends BuilderAbstract
                     );
 
                 } else {
-                    $p = $this->pixel2int(round($nX), round($nY));
+                    $p = $this->pixel2int($this->round($nX), $this->round($nY));
                 }
 
                 if ($p == 0) {
@@ -635,7 +637,7 @@ class Builder extends BuilderAbstract
 
         # Apply effects
         if ($this->applyEffects) {
-            $effects = mt_rand($surface / 3000, $surface / 2000);
+            $effects = $this->random_float($surface / 3000, $surface / 2000);
 
             # Set the maximum number of lines to draw in front of the text
             if (is_int($this->maxLinesBehind) && $this->maxLinesBehind > 0) {
@@ -659,7 +661,7 @@ class Builder extends BuilderAbstract
 
         # Apply effects
         if ($this->applyEffects) {
-            $effects = mt_rand($surface / 3000, $surface / 2000);
+            $effects = $this->random_float($surface / 3000, $surface / 2000);
 
             # Set the maximum number of lines to draw in front of the text
             if (is_int($this->maxLinesFront) && $this->maxLinesFront > 0) {
@@ -792,8 +794,16 @@ class Builder extends BuilderAbstract
 
         for ($y = 0; $y < $this->height; $y++) {
             for ($x = 0; $x < $this->width; $x++) {
+                # Compose color
                 $colors = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-                $pgm .= chr(0.3 * $colors['red'] + 0.59 * $colors['green'] + 0.11 * $colors['blue']);
+
+                # Extract its RGB values & make them gray-ish
+                $red = $this->round(0.3 * $colors['red']);
+                $green = $this->round(0.59 * $colors['green']);
+                $blue = $this->round(0.11 * $colors['blue']);
+
+                # Create single-byte string from them 
+                $pgm .= chr($red + $green + $blue);
             }
         }
 
@@ -1022,5 +1032,35 @@ class Builder extends BuilderAbstract
     public function inline(int $quality = 90, string $type = 'jpg'): string
     {
         return sprintf('data:%s;base64,%s', Mime::fromExtension($type), base64_encode($this->fetch($quality, $type)));
+    }
+
+
+    /**
+     * Helpers
+     */
+
+    /**
+     * Rounds float to integer
+     * 
+     * @param float $number
+     * @return int
+     */
+    private function round(float $number): int
+    {
+        return (int) round($number);
+    }
+
+
+    /**
+     * Creates random float between two digits
+     * 
+     * @param float|int $min
+     * @param float|int $max
+     * @return float
+     */
+    private function random_float($min, $max): float
+    {
+        # See https://www.php.net/manual/en/function.mt-rand.php#75793
+        return ($min + lcg_value() * (abs($max - $min)));
     }
 }
