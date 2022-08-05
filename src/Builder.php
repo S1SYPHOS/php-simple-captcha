@@ -875,7 +875,7 @@ class Builder extends BuilderAbstract
         Dir::remove($tmpDir);
 
         # Iterate over possible matches
-        foreach ($outputs as $output) {
+        foreach (array_filter($outputs) as $output) {
             # .. clean & validate them
             if ($this->compare(preg_replace('/[^a-z0-9]/i', '', $output))) {
                 return true;
