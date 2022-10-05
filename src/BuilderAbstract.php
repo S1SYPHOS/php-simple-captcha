@@ -63,7 +63,7 @@ abstract class BuilderAbstract
      * @param string $type Captcha image output format
      * @return void
      */
-    public abstract function output(int $quality = 90, string $type): void;
+    public abstract function output(int $quality = 90, string $type = 'jpg'): void;
 
 
     /**
@@ -73,7 +73,7 @@ abstract class BuilderAbstract
      * @param string $type Captcha image output format
      * @return string
      */
-    public abstract function fetch(int $quality = 90, string $type): string;
+    public abstract function fetch(int $quality = 90, string $type = 'jpg'): string;
 
 
     /**
@@ -83,7 +83,7 @@ abstract class BuilderAbstract
      * @param string $type Captcha image output format
      * @return string
      */
-    public abstract function inline(int $quality = 90, string $type): string;
+    public abstract function inline(int $quality = 90, string $type = 'jpg'): string;
 
 
     /**
