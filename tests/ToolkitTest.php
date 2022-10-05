@@ -6,7 +6,6 @@ use SimpleCaptcha\Toolkit;
 
 use Exception;
 
-
 /**
  * Class BuilderTest
  *

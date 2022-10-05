@@ -7,8 +7,7 @@
     "keywords": ["captcha", "anti-spam", "spam-protection", "spam", "obfuscation", "security", "anti-bot", "no-bot", "bot-protection"],
     "homepage": "https://codeberg.org/S1SYPHOS/php-simple-captcha",
     "scripts": {
-        "cs-dry": "php-cs-fixer fix --dry-run --diff",
-        "cs-fix": "php-cs-fixer fix",
+        "lint": "pint --verbose",
         "test": "phpunit"
     },
     "authors": [
@@ -39,9 +38,10 @@
         "thiagoalessio/tesseract_ocr": "Provides better results when building against OCR. Requires 'tesseract-ocr' to be installed."
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.4",
+        "laravel/pint": "^1.1",
         "phpunit/phpunit": "^8.5|^9.0",
-        "mikey179/vfsstream": "^1.6"
+        "mikey179/vfsstream": "^1.6",
+        "vimeo/psalm": "^4.26"
     },
     "autoload": {
         "psr-4": {

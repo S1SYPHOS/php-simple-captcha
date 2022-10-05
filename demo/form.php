@@ -28,15 +28,13 @@ session_start();
 
                 if (isset($_SESSION['phrase']) && $captcha->compare($_SESSION['phrase'], $_POST['phrase'])) {
                     echo 'Captcha is valid!';
-                }
-
-                else {
+                } else {
                     echo 'Captcha is invalid!';
                 }
 
                 # Delete phrase stored in session
                 unset($_SESSION['phrase']);
             }
-        ?>
+?>
     </body>
 </html>

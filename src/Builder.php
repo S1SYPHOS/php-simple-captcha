@@ -10,6 +10,8 @@ use SimpleCaptcha\Helpers\Dir;
 use SimpleCaptcha\Helpers\Str;
 use SimpleCaptcha\Helpers\Mime;
 
+use \thiagoalessio\TesseractOCR\TesseractOCR;
+
 use GdImage;
 use resource;
 use Exception;
@@ -299,25 +301,25 @@ class Builder extends BuilderAbstract
      */
     private function applyNoise(): void
     {
-		for ($i = 0; $i < Str::length($this->phrase) * $this->noiseFactor; $i++) {
+        for ($i = 0; $i < Str::length($this->phrase) * $this->noiseFactor; $i++) {
             # Determine random letter ..
-			$character = static::randomCharacter();
+            $character = static::randomCharacter();
             $font = $this->randomFont();
 
             # .. of random size & color, ..
-			$fontSize = mt_rand(5, 10);
+            $fontSize = mt_rand(5, 10);
             $textColor = imagecolorallocate($this->image, mt_rand(0, 128), mt_rand(0, 128), mt_rand(0, 128));
 
             # .. random position ..
             $x = mt_rand(0, $this->width);
-			$y = mt_rand(0, $this->height);
+            $y = mt_rand(0, $this->height);
 
             # .. random angle ..
-			$angle = mt_rand(-45, 45);
+            $angle = mt_rand(-45, 45);
 
             # .. and apply it
-			imagettftext($this->image, $fontSize, $angle, $x, $y, $textColor, $font, $character);
-		}
+            imagettftext($this->image, $fontSize, $angle, $x, $y, $textColor, $font, $character);
+        }
     }
 
 
@@ -545,7 +547,6 @@ class Builder extends BuilderAbstract
                     $Vn2 = $Vn + 4 * sin($Vn / 30);
                     $nX  = $X + ($Vx * $Vn2 / $Vn);
                     $nY  = $Y + ($Vy * $Vn2 / $Vn);
-
                 } else {
                     $nX = $X;
                     $nY = $Y;
@@ -562,7 +563,6 @@ class Builder extends BuilderAbstract
                         $this->pixel2int(floor($nX), ceil($nY)),
                         $this->pixel2int(ceil($nX), ceil($nY))
                     );
-
                 } else {
                     $p = $this->pixel2int($this->round($nX), $this->round($nY));
                 }
@@ -695,12 +695,12 @@ class Builder extends BuilderAbstract
      * See https://priteshgupta.com/2011/09/advanced-image-functions-using-php
      * See https://github.com/raoulduke/phpocrad
      *
-     * @param string $file Output file
+     * @param string $output Output file
      * @param int $amount
      * @param int $threshold
      * @return void
      */
-    private function img2ocr(?string $output = null, int $amount = 80, int $threshold = 3): void
+    private function img2ocr(string $output, int $amount = 80, int $threshold = 3): void
     {
         $image = $this->image;
 
@@ -752,9 +752,7 @@ class Builder extends BuilderAbstract
                     }
                 }
             }
-        }
-
-        else {
+        } else {
             for ($x = 0; $x < $this->width; $x++) { # each row
                 for ($y = 0; $y < $this->height; $y++) { # each pixel
                     $rgbOrig = imagecolorat($image, $x, $y);
@@ -770,14 +768,23 @@ class Builder extends BuilderAbstract
                     $bBlur = ($rgbBlur & 0xFF);
 
                     $rNew = ($amount * ($rOrig - $rBlur)) + $rOrig;
-                        if ($rNew > 255) { $rNew = 255; }
-                        elseif ($rNew < 0) { $rNew = 0; }
+                    if ($rNew > 255) {
+                        $rNew = 255;
+                    } elseif ($rNew < 0) {
+                        $rNew = 0;
+                    }
                     $gNew = ($amount * ($gOrig - $gBlur)) + $gOrig;
-                        if ($gNew > 255) { $gNew = 255; }
-                        elseif ($gNew < 0) { $gNew = 0; }
+                    if ($gNew > 255) {
+                        $gNew = 255;
+                    } elseif ($gNew < 0) {
+                        $gNew = 0;
+                    }
                     $bNew = ($amount * ($bOrig - $bBlur)) + $bOrig;
-                        if ($bNew > 255) { $bNew = 255; }
-                        elseif ($bNew < 0) { $bNew = 0; }
+                    if ($bNew > 255) {
+                        $bNew = 255;
+                    } elseif ($bNew < 0) {
+                        $bNew = 0;
+                    }
                     $rgbNew = ($rNew << 16) + ($gNew << 8) + $bNew;
 
                     imagesetpixel($image, $x, $y, $rgbNew);
@@ -802,13 +809,9 @@ class Builder extends BuilderAbstract
                 $green = $this->round(0.59 * $colors['green']);
                 $blue = $this->round(0.11 * $colors['blue']);
 
-                # Create single-byte string from them 
+                # Create single-byte string from them
                 $pgm .= chr($red + $green + $blue);
             }
-        }
-
-        if (empty($output)) {
-            $output = sprintf('%s/%s.pgm', F::dirname($file), F::name($file));
         }
 
         F::write($output, $pgm);
@@ -858,9 +861,9 @@ class Builder extends BuilderAbstract
         # Iterate over available modes ..
         foreach ($modes as $mode) {
             # .. using (suggested) external library (if available), otherwise ..
-            if ($mode == 'tesseract' && class_exists('\thiagoalessio\TesseractOCR\TesseractOCR')) {
+            if ($mode == 'tesseract' && class_exists(TesseractOCR::class)) {
                 # Execute  `tesseract-ocr-for-php` & store its output
-                $tesseract = new \thiagoalessio\TesseractOCR\TesseractOCR($pgmFile);
+                $tesseract = new TesseractOCR($pgmFile);
                 $outputs[] = $tesseract->allowlist(range(0, 9), range('a', 'z'), range('A', 'Z'))->dpi(2200)->run();
             }
 
@@ -956,13 +959,9 @@ class Builder extends BuilderAbstract
 
         if ($type == 'gif') {
             imagegif($this->image, $filename);
-        }
-
-        elseif ($type == 'jpg') {
+        } elseif ($type == 'jpg') {
             imagejpeg($this->image, $filename, $quality);
-        }
-
-        elseif ($type == 'png') {
+        } elseif ($type == 'png') {
             # Normalize quality
             if ($quality > 9) {
                 $quality = -1;
@@ -1041,7 +1040,7 @@ class Builder extends BuilderAbstract
 
     /**
      * Rounds float to integer
-     * 
+     *
      * @param float $number
      * @return int
      */
@@ -1053,7 +1052,7 @@ class Builder extends BuilderAbstract
 
     /**
      * Creates random float between two digits
-     * 
+     *
      * @param float|int $min
      * @param float|int $max
      * @return float

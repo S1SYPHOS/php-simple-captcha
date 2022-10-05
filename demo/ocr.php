@@ -23,7 +23,7 @@ $passed = 0;
 for ($i = 0; $i < $total; $i++) {
     echo sprintf('Captcha %s/%s ..', $i + 1, $total);
 
-    $captcha = new Builder;
+    $captcha = new Builder();
     $captcha->distortion = false;
     $captcha->build();
 
@@ -34,9 +34,7 @@ for ($i = 0; $i < $total; $i++) {
         $captcha->save("tmp/passed-$passed.jpg");
 
         echo ' passed!<br>';
-    }
-
-    else {
+    } else {
         echo ' failed!<br>';
     }
 

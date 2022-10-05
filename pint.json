@@ -1,0 +1,7 @@
+{
+    "preset": "psr12",
+    "rules": {},
+    "exclude": [
+        "src/Helpers"
+    ]
+}

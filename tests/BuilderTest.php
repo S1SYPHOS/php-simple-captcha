@@ -11,7 +11,6 @@ use org\bovigo\vfs\vfsStreamDirectory;
 
 use Exception;
 
-
 /**
  * Class BuilderTest
  *

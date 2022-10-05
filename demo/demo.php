@@ -14,4 +14,5 @@ foreach (Dir::files('tmp') as $file) {
     F::remove($file);
 }
 
-Builder::create()->build()->save('tmp/out.jpg');;
+Builder::create()->build()->save('tmp/out.jpg');
+;
