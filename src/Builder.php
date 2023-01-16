@@ -36,6 +36,16 @@ class Builder extends BuilderAbstract
      * @var resource|GdImage
      */
     public $image;
+    
+    /**
+     * @var int $width
+     */
+    public int $width;
+
+    /**
+     * @var int $height
+     */
+    public int $height;
 
 
     /**
