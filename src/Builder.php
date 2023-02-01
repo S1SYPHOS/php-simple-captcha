@@ -36,6 +36,22 @@ class Builder extends BuilderAbstract
 
 
     /**
+     * Image width
+     *
+     * @var int
+     */
+    public int $width;
+
+
+    /**
+     * Image height
+     *
+     * @var int
+     */
+    public int $height;
+
+
+    /**
      * Path to captcha font(s)
      *
      * @var array
