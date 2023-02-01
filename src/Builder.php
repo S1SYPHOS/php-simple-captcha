@@ -13,7 +13,6 @@ use SimpleCaptcha\Helpers\Mime;
 use \thiagoalessio\TesseractOCR\TesseractOCR;
 
 use GdImage;
-use resource;
 use Exception;
 
 
@@ -31,11 +30,9 @@ class Builder extends BuilderAbstract
     /**
      * Captcha image
      *
-     * As of PHP 8.0, this is `GdImage` instead of `resource`
-     *
-     * @var resource|GdImage
+     * @var GdImage
      */
-    public $image;
+    public GdImage $image;
 
 
     /**
@@ -109,7 +106,7 @@ class Builder extends BuilderAbstract
     /**
      * Background color code
      *
-     * @var array
+     * @var int
      */
     private int $bgCode;
 
@@ -139,7 +136,7 @@ class Builder extends BuilderAbstract
     /**
      * Path to background image
      *
-     * @var array
+     * @var string
      */
     public ?string $bgImage = null;
 
@@ -485,10 +482,10 @@ class Builder extends BuilderAbstract
     /**
      * Makes image background transparent
      *
-     * @param resource|GdImage $image
+     * @param GdImage $image
      * @return void
      */
-    private function addTransparency($image): void
+    private function addTransparency(GdImage $image): void
     {
         imagealphablending($image, false);
         $transparency = imagecolorallocatealpha($image, 0, 0, 0, 127);
@@ -910,10 +907,10 @@ class Builder extends BuilderAbstract
      * Creates GD image object from file
      *
      * @param string $image
-     * @return resource|GdImage
+     * @return GdImage
      * @throws \Exception
      */
-    protected function img2gd(string $file)
+    protected function img2gd(string $file): GdImage
     {
         # If file does not exist ..
         if (!F::exists($file)) {
