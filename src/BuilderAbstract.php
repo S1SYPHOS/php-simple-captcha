@@ -94,7 +94,7 @@ abstract class BuilderAbstract
     /**
      * Picks random character
      *
-     * @param string $charset Characters to choose from
+     * @param string|null $charset Characters to choose from
      * @return string
      */
     public static function randomCharacter(?string $charset = null): string
@@ -122,7 +122,7 @@ abstract class BuilderAbstract
      * Builds random phrase
      *
      * @param int $length Number of characters
-     * @param string $charset Characters to choose from
+     * @param string|null $charset Characters to choose from
      * @return string
      */
     public static function buildPhrase(int $length = 5, ?string $charset = null): string
@@ -154,7 +154,7 @@ abstract class BuilderAbstract
      * Checks whether captcha was solved correctly
      *
      * @param string $phrase Phrase to be tested
-     * @param string $string Phrase to be tested against (optional)
+     * @param string|null $string Phrase to be tested against (optional)
      * @return bool
      */
     public function compare(string $phrase, ?string $string = null): bool

@@ -10,11 +10,10 @@ use SimpleCaptcha\Helpers\Dir;
 use SimpleCaptcha\Helpers\Str;
 use SimpleCaptcha\Helpers\Mime;
 
-use \thiagoalessio\TesseractOCR\TesseractOCR;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 use GdImage;
 use Exception;
-
 
 /**
  * Class Builder
@@ -56,7 +55,7 @@ class Builder extends BuilderAbstract
      *
      * @var array
      */
-    public ?array $fonts = null;
+    public array $fonts;
 
 
     /**
@@ -78,7 +77,7 @@ class Builder extends BuilderAbstract
     /**
      * Maximum number of lines behind the captcha phrase
      *
-     * @var int
+     * @var int|null
      */
     public ?int $maxLinesBehind = null;
 
@@ -86,7 +85,7 @@ class Builder extends BuilderAbstract
     /**
      * Maximum number of lines in front of the captcha phrase
      *
-     * @var int
+     * @var int|null
      */
     public ?int $maxLinesFront = null;
 
@@ -116,7 +115,7 @@ class Builder extends BuilderAbstract
      *
      * @var array|string
      */
-    public $bgColor = null;
+    public array|string $bgColor = 'transparent';
 
 
     /**
@@ -135,7 +134,7 @@ class Builder extends BuilderAbstract
      *
      * @var array|string
      */
-    public $lineColor = null;
+    public array|string $lineColor;
 
 
     /**
@@ -146,13 +145,13 @@ class Builder extends BuilderAbstract
      *
      * @var array|string
      */
-    public $textColor = null;
+    public array|string $textColor;
 
 
     /**
      * Path to background image
      *
-     * @var string
+     * @var string|null
      */
     public ?string $bgImage = null;
 
@@ -208,7 +207,7 @@ class Builder extends BuilderAbstract
     /**
      * Constructor
      *
-     * @param string $phrase Captcha phrase
+     * @param string|null $phrase Captcha phrase
      * @return void
      */
     public function __construct(?string $phrase = null)
@@ -228,7 +227,7 @@ class Builder extends BuilderAbstract
     /**
      * Instantiates 'CaptchaBuilder' object
      *
-     * @param string $phrase Captcha phrase
+     * @param string|null $phrase Captcha phrase
      * @return self
      */
     public static function create(?string $phrase = null): self
@@ -244,7 +243,7 @@ class Builder extends BuilderAbstract
      * @return array
      * @throws \Exception
      */
-    private function getColor($color): array
+    private function getColor(string|array $color): array
     {
         # If value represents RGB values ..
         if (is_array($color)) {
@@ -263,7 +262,7 @@ class Builder extends BuilderAbstract
     /**
      * Draws lines over the image
      *
-     * @param int $color Line color
+     * @param int|null $color Line color
      * @return void
      */
     private function drawLine(?int $color = null): void
@@ -339,7 +338,8 @@ class Builder extends BuilderAbstract
     /**
      * Picks random font file
      *
-     * @return string
+     * @return string Path to random font file
+     * @throws \Exception Font file does not exist
      */
     private function randomFont(): string
     {
@@ -517,7 +517,7 @@ class Builder extends BuilderAbstract
      * @param float|int $y Vertical position (or an estimation thereof)
      * @return int
      */
-    private function pixel2int($x, $y): int
+    private function pixel2int(float|int $x, float|int $y): int
     {
         if ($x < 0 || $x >= $this->width || $y < 0 || $y >= $this->height) {
             return $this->bgCode;
@@ -834,9 +834,9 @@ class Builder extends BuilderAbstract
     /**
      * Checks whether captcha image may be solved through OCR
      *
-     * @param string $tmpDir Directory
+     * @param string $tmpDir Temporary directory
      * @return bool
-     * @throws \Exception
+     * @throws \Exception No OCR tool installed
      */
     public function isOCRReadable(string $tmpDir = '.tmp'): bool
     {
@@ -922,9 +922,9 @@ class Builder extends BuilderAbstract
     /**
      * Creates GD image object from file
      *
-     * @param string $image
+     * @param string $image Path to image file
      * @return GdImage
-     * @throws \Exception
+     * @throws \Exception Image file does not exist OR its MIME type is unsupported
      */
     protected function img2gd(string $file): GdImage
     {
@@ -957,7 +957,7 @@ class Builder extends BuilderAbstract
      * @param string $filename Output filepath
      * @param string $type Captcha image output format
      * @return void
-     * @throws \Exception
+     * @throws \Exception File type is unsupported
      */
     protected function gd2img(int $quality = 90, ?string $filename = null, string $type = 'jpg'): void
     {
@@ -1070,7 +1070,7 @@ class Builder extends BuilderAbstract
      * @param float|int $max
      * @return float
      */
-    private function random_float($min, $max): float
+    private function random_float(float|int $min, float|int $max): float
     {
         # See https://www.php.net/manual/en/function.mt-rand.php#75793
         return ($min + lcg_value() * (abs($max - $min)));
